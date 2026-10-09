@@ -1,0 +1,39 @@
+{
+  "id": "/",
+  "name": "Scam Shield v2.4 - Anti-Fraud & Cyber Defense",
+  "short_name": "ScamShield",
+  "description": "Next-generation anti-fraud cybersecurity defense HUD engineered for Indian citizens with offline rural threat scanner and scam awareness.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#020611",
+  "background_color": "#020611",
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["utilities", "security", "education"]
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Scam Shield",
+  "description": "Next-generation anti-fraud and cybersecurity verification app designed for elderly, non-tech-savvy, and rural smartphone users to verify suspicious SMS, WhatsApp forwards, URLs, and screenshots in English, Tamil, and Hindi.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
