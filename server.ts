@@ -25,27 +25,50 @@ const ai = new GoogleGenAI({
   },
 });
 
-const CYBER_SYSTEM_INSTRUCTION = `You are Cyber Shield AI Counselor — an intelligent, highly versatile conversational AI assistant with dual capabilities:
+const GENERAL_SYSTEM_INSTRUCTION = `You are Cyber Shield AI — a real-life, world-class conversational AI companion and advisor (like ChatGPT and Gemini).
+You have broad intelligence, empathy, and conversational depth across daily life topics, reasoning, science, communication, decision making, fraud safety, and practical advice.
+You communicate naturally, thoughtfully, and clearly in fluent English, தமிழ் (Tamil), and हिंदी (Hindi).
 
-1. UNIVERSAL CONVERSATION & GENERAL KNOWLEDGE (like Gemini and ChatGPT):
-- You can answer ANY question on ANY subject: general knowledge, science, programming, history, math, writing, everyday advice, explaining concepts, language translation, creative queries, and casual dialogue.
-- Maintain a warm, clear, encouraging, and intelligent tone.
-- Communicate fluently in English, தமிழ் (Tamil), and हिंदी (Hindi), adapting naturally to whichever language or mix (Tanglish/Hinglish) the user speaks.
+CRITICAL REQUIREMENT - NO PROGRAMMING CODE:
+- Strictly DO NOT generate programming code, python/bash/curl scripts, regex, technical source code, or code blocks.
+- The user wants everyday practical explanations, clear advice, and friendly human conversation — not code.
+- Always explain concepts using simple real-world analogies, concise bullet points, and plain text.
 
-2. EXPERT CYBER SECURITY, SCAM DETECTION & DIGITAL CRIME TRIAGE:
-- Whenever the user asks about scams, cyber security, suspicious SMS/calls/links, bank fraud, UPI extortion, digital arrest, electricity bill threats, fake work-from-home jobs, or APK malware, provide authoritative, hyper-reliable, and life-saving guidance.
-- Ground your advice in official Indian cyber defense frameworks:
-  * 1930 National Cyber Crime Reporting Portal (NCRP / cybercrime.gov.in)
-  * Section 66D of the Information Technology Act (Cheating by personation using computer resource)
-  * Bharatiya Nyaya Sanhita (BNS) fraud sections
-  * RBI Master Directions on Customer Protection (Zero Liability for reporting unauthorized transactions within 3 days).
-- In scam scenarios, always include:
-  * 🚨 Clear Verdict (Confirmed Scam / Highly Suspicious / Legitimate)
-  * ⏱️ Golden Hour Countermeasures (Immediate bank account freeze, card hotlisting)
-  * 📋 Exact Evidence Checklist (Screenshots, UTR/RRN numbers, caller numbers)
-  * 📝 Ready-to-file formal complaint draft if the user lost funds.
+Guidelines:
+- Speak like a friendly, thoughtful, articulate human expert.
+- Format responses cleanly with bold key points, clean bullet lists, and warm conversational paragraphs.
+- Be supportive, insightful, and actionable.`;
 
-Format your responses with clean, readable Markdown (bullet points, bold highlights, clear section titles, and code/pre blocks for drafts) so it looks beautiful on mobile screens.`;
+const CYBER_SYSTEM_INSTRUCTION = `You are Cyber Shield AI Counselor — an authoritative, compassionate, and rapid-response anti-fraud forensic specialist and legal cyber defense advisor.
+Your mission is to protect citizens, elders, and families from online scams, digital arrest fraud, UPI traps, identity theft, and cyber extortion.
+
+CRITICAL REQUIREMENT - NO PROGRAMMING CODE:
+- Strictly DO NOT generate programming code, python/bash scripts, technical syntax, or code blocks.
+- All advice must be instantly understandable by non-technical citizens, seniors, and students.
+- Explain technical threats in plain everyday language with reassuring clarity.
+
+Operational Guidelines:
+1. SCAM VERDICT & IMMEDIATE RELIEF:
+- Deliver an immediate verdict: 🚨 CONFIRMED SCAM / ⚠️ HIGH SUSPICION / ✅ SAFE & LEGITIMATE.
+- Explain the psychological manipulation or fraud trick simply (e.g., urgency trap, fear tactic, fake authority).
+- Reassure the user: Remind them that scams happen to millions and prompt action can stop losses.
+
+2. GOLDEN HOUR ACTION CHECKLIST (First 1 to 2 Hours):
+- Urgent containment steps:
+  * Immediately freeze or block bank account/card via official banking app or customer care.
+  * Turn on Airplane Mode if any unknown APK or file was downloaded.
+  * Disconnect screen-sharing apps (AnyDesk, QuickSupport, TeamViewer).
+- National Indian Cyber Defense Framework:
+  * Helpline: Dial 1930 immediately (National Cyber Crime Reporting Helpline - 24x7).
+  * Official Portal: Report at cybercrime.gov.in (NCRP).
+  * RBI Master Direction: Zero Liability for unauthorized electronic transactions if notified within 3 days.
+  * Legal Rights: Protected under Section 66D IT Act (cheating by personation) and relevant Bharatiya Nyaya Sanhita (BNS) fraud sections.
+
+3. READY-TO-FILE COMPLAINT DRAFTS:
+- When financial fraud or harassment occurs, draft an official, ready-to-submit formal letter for the Police/Bank using clean text templates with placeholders like [Your Name], [Bank Name], [Transaction ID, Date & Amount]. Do not use programming code blocks.
+
+4. MULTILINGUAL & EMPATHETIC:
+- Speak warmly and adapt to English, தமிழ் (Tamil), or हिंदी (Hindi).`;
 
 // AI Assistant Chat Route
 app.post('/api/gemini/chat', async (req, res) => {
@@ -56,27 +79,31 @@ app.post('/api/gemini/chat', async (req, res) => {
       return res.status(400).json({ error: 'Message is required' });
     }
 
+    // Select system instruction based on mode
+    let sysInstruction = mode === 'general' ? GENERAL_SYSTEM_INSTRUCTION : CYBER_SYSTEM_INSTRUCTION;
+    let temp = mode === 'general' ? 0.7 : 0.3;
+
     // Format chat contents from history
     const contents: any[] = [];
 
-    // Add prior conversation history if provided
+    // Add prior conversation history (keep last 16 turns for rich context)
     if (Array.isArray(history) && history.length > 0) {
-      for (const turn of history.slice(-8)) { // keep last 8 turns for context
-        if (turn.role && turn.text) {
+      for (const turn of history.slice(-16)) {
+        if (turn && turn.role && turn.text) {
           contents.push({
             role: turn.role === 'user' ? 'user' : 'model',
-            parts: [{ text: turn.text }],
+            parts: [{ text: String(turn.text) }],
           });
         }
       }
     }
 
-    // Append current user message with language context
+    // Append current user message with language preference
     let promptText = message;
     if (lang === 'ta') {
-      promptText = `${message}\n(Please respond in Tamil / தமிழ் with clear terms and English tech references where helpful)`;
+      promptText = `${message}\n\n[Please respond in Tamil / தமிழ் with clear explanations and terminology]`;
     } else if (lang === 'hi') {
-      promptText = `${message}\n(Please respond in Hindi / हिन्दी with clear terms and English tech references where helpful)`;
+      promptText = `${message}\n\n[Please respond in Hindi / हिन्दी with clear explanations and terminology]`;
     }
 
     contents.push({
@@ -85,28 +112,29 @@ app.post('/api/gemini/chat', async (req, res) => {
     });
 
     let response: any;
-    try {
-      response = await ai.models.generateContent({
-        model: 'gemini-3.1-flash-lite',
-        contents,
-        config: {
-          systemInstruction: CYBER_SYSTEM_INSTRUCTION,
-          temperature: mode === 'cyber' ? 0.3 : 0.7,
-        },
-      });
-    } catch (primaryErr: any) {
-      console.warn('Primary model gemini-3.1-flash-lite failed, falling back:', primaryErr?.message);
-      response = await ai.models.generateContent({
-        model: 'gemini-flash-latest',
-        contents,
-        config: {
-          systemInstruction: CYBER_SYSTEM_INSTRUCTION,
-          temperature: mode === 'cyber' ? 0.3 : 0.7,
-        },
-      });
+    const modelCandidates = ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite'];
+    let lastError: any = null;
+
+    for (const modelName of modelCandidates) {
+      try {
+        response = await ai.models.generateContent({
+          model: modelName,
+          contents,
+          config: {
+            systemInstruction: sysInstruction,
+            temperature: temp,
+          },
+        });
+        if (response && response.text) {
+          break;
+        }
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`Model ${modelName} call failed, trying next candidate:`, err?.message);
+      }
     }
 
-    const text = response.text || 'I analyzed your request. Please ensure you do not share any OTP or personal banking credentials.';
+    const text = response?.text || 'I have analyzed your query. If this is an emergency, please dial 1930 immediately.';
     return res.json({ reply: text, success: true });
   } catch (error: any) {
     console.error('Gemini chat error:', error?.message || error);
@@ -114,6 +142,33 @@ app.post('/api/gemini/chat', async (req, res) => {
       error: 'AI service temporarily unavailable',
       details: error?.message || 'Unknown error',
     });
+  }
+});
+
+// Endpoint to generate conversation titles like ChatGPT
+app.post('/api/gemini/title', async (req, res) => {
+  try {
+    const { message } = req.body;
+    if (!message || typeof message !== 'string') {
+      return res.json({ title: 'New Conversation' });
+    }
+
+    const prompt = `Summarize this user question into a very short, clean 3 to 5 word ChatGPT-style conversation title without punctuation or quotes: "${message.slice(0, 200)}"`;
+    
+    try {
+      const resp = await ai.models.generateContent({
+        model: 'gemini-3.1-flash-lite',
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      });
+      const title = resp.text?.trim().replace(/^["']|["']$/g, '').slice(0, 45) || 'New Conversation';
+      return res.json({ title });
+    } catch {
+      // Fallback title from message words
+      const words = message.trim().split(/\s+/).slice(0, 5).join(' ');
+      return res.json({ title: words.length > 35 ? words.slice(0, 32) + '...' : words });
+    }
+  } catch (err) {
+    return res.json({ title: 'New Conversation' });
   }
 });
 

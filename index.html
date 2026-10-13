@@ -29,6 +29,9 @@
     <!-- FontAwesome 6 CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+    <!-- Marked.js CDN for rich Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.1/marked.min.js"></script>
+
     <!-- Three.js CDN for 3D Cyber Grid -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
@@ -445,17 +448,6 @@
                 <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-cyan-900/60 text-cyan-300 border border-cyan-500/30">AI Vision</span>
               </button>
 
-              <!-- Live Risk Heatmap & Radar -->
-              <button type="button" data-view="radar" class="nav-tab-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all text-slate-300 hover:text-white hover:bg-slate-800/60 border border-transparent cursor-pointer">
-                <div class="flex items-center gap-2.5">
-                  <div class="w-6 h-6 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center text-xs">
-                    <i class="fa-solid fa-radar"></i>
-                  </div>
-                  <span data-i18n="navRadar">Live Risk Heatmap & Radar</span>
-                </div>
-                <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-red-950 text-red-300 border border-red-500/40 animate-pulse">24h Radar</span>
-              </button>
-
               <!-- Incident History -->
               <button type="button" data-view="history" class="nav-tab-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all text-slate-300 hover:text-white hover:bg-slate-800/60 border border-transparent cursor-pointer">
                 <div class="flex items-center gap-2.5">
@@ -503,11 +495,22 @@
               <button type="button" id="drawer-helpline-btn" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all text-red-300 hover:text-white hover:bg-red-950/60 border border-red-500/30 cursor-pointer group">
                 <div class="flex items-center gap-2.5">
                   <div class="w-6 h-6 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-shield-cat"></i>
+                    <i class="fa-solid fa-phone-volume"></i>
                   </div>
                   <span data-i18n="navHelpline" class="font-bold">Helpline & Action Plan</span>
                 </div>
                 <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-black bg-red-600 text-white animate-pulse">1930</span>
+              </button>
+
+              <!-- Interactive Onboarding Walkthrough Drawer Button -->
+              <button type="button" id="drawer-walkthrough-btn" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all text-cyan-300 hover:text-white hover:bg-cyan-950/60 border border-cyan-500/30 cursor-pointer group">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-circle-question"></i>
+                  </div>
+                  <span class="font-bold">New User App Tour</span>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-400/40">GUIDE</span>
               </button>
             </nav>
           </div>
@@ -622,6 +625,12 @@
         <!-- Right: Audio SFX + Language + 1930 + USER AUTH BUTTON -->
         <div class="flex items-center gap-1 sm:gap-2 shrink-0">
           
+          <!-- Guided Onboarding Walkthrough Trigger -->
+          <button id="top-walkthrough-btn" title="How to use this app (Step-by-step Tour)" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 sm:py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-750 border border-cyan-400/40 text-cyan-300 text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-sm">
+            <i class="fa-solid fa-circle-question text-cyan-400 text-xs animate-bounce"></i>
+            <span class="hidden md:inline font-mono text-[11px]">Quick Tour</span>
+          </button>
+
           <!-- Audio SFX Toggle -->
           <button id="audio-sfx-toggle" title="Toggle UI Sound Effects" class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-cyan-500/30 text-cyan-300 flex items-center justify-center transition-colors active:scale-95 text-xs cursor-pointer" aria-label="Toggle Audio SFX">
             <i id="audio-sfx-icon" class="fa-solid fa-volume-high text-[11px]"></i>
@@ -783,17 +792,19 @@
           </div>
 
           <!-- GLOWING CAPSULE ACTION DOCK -->
-          <div class="flex items-center gap-3 pt-2">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-2">
             <!-- Launch Threat Scanner Capsule Button -->
-            <button type="button" data-switch-to="scanner" class="flex-1 py-4 px-6 rounded-full bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 hover:from-blue-500 hover:to-cyan-400 text-white font-black text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-[0_0_35px_rgba(0,240,255,0.6)] active:scale-95 transition-all cursor-pointer">
-              <i class="fa-solid fa-magnifying-glass-shield text-lg animate-pulse"></i>
+            <button type="button" id="home-launch-scanner-btn" data-switch-to="scanner" class="flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 hover:from-blue-500 hover:to-cyan-400 text-white font-black text-sm flex items-center justify-center gap-2.5 shadow-[0_0_30px_rgba(0,240,255,0.45)] active:scale-95 transition-all cursor-pointer">
+              <i class="fa-solid fa-magnifying-glass-shield text-base animate-pulse"></i>
               <span data-i18n="openScannerCta">Launch Threat Scanner</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
 
-            <!-- Circular Orb Button for Live Radar -->
-            <button type="button" data-switch-to="radar" class="w-14 h-14 rounded-full bg-[#081226]/90 hover:bg-slate-800 border-2 border-cyan-400/50 hover:border-cyan-300 text-cyan-300 flex items-center justify-center shadow-[0_0_20px_rgba(0,240,255,0.3)] active:scale-95 transition-all cursor-pointer shrink-0" title="Open Live Threat Radar">
-              <i class="fa-solid fa-radar text-xl text-red-400 animate-spin-slow"></i>
+            <!-- Interactive Onboarding Walkthrough Trigger -->
+            <button type="button" id="home-start-walkthrough-btn" class="py-3.5 px-4 rounded-2xl bg-[#081226]/95 hover:bg-slate-800 border-2 border-cyan-400/50 hover:border-cyan-300 text-cyan-200 font-bold text-xs flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,240,255,0.25)] active:scale-95 transition-all cursor-pointer shrink-0" title="Start Interactive Walkthrough">
+              <i class="fa-solid fa-compass text-cyan-400 text-sm animate-spin-slow"></i>
+              <span>App Guide Walkthrough</span>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-black bg-cyan-950 text-cyan-300 border border-cyan-400/40">NEW</span>
             </button>
           </div>
 
@@ -1206,172 +1217,266 @@
         <!-- ============================================================== -->
         <!-- VIEW: CYBER SHIELD AI INTELLIGENCE & UNIVERSAL CHAT TERMINAL   -->
         <!-- ============================================================== -->
-        <section id="view-ai-assistant" class="app-view hidden space-y-3">
-          <div class="tilt-card rounded-3xl bg-gradient-to-b from-[#081226]/95 via-[#040814]/98 to-[#02050E]/98 border-2 border-cyan-500/40 shadow-[0_0_45px_rgba(0,240,255,0.2)] flex flex-col h-[700px] max-h-[85vh] overflow-hidden relative">
+        <section id="view-ai-assistant" class="app-view hidden w-full">
+          <div id="ai-chat-main-container" class="w-full rounded-3xl bg-gradient-to-b from-[#071124] via-[#040816] to-[#02050e] border border-cyan-500/35 shadow-[0_0_50px_rgba(0,240,255,0.15)] flex flex-col md:flex-row h-[calc(100vh-6.5rem)] min-h-[660px] max-h-[92vh] overflow-hidden relative transition-all duration-300">
             
-            <!-- Terminal Header -->
-            <div class="p-3.5 sm:p-4 border-b border-cyan-500/30 bg-[#060D1A]/90 backdrop-blur-xl flex flex-wrap items-center justify-between gap-2 shrink-0">
-              <div class="flex items-center gap-3">
-                <div class="relative">
-                  <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-600 via-indigo-600 to-cyan-500 flex items-center justify-center text-lg text-white shadow-[0_0_20px_rgba(0,240,255,0.5)] border border-cyan-300/50">
-                    <i class="fa-solid fa-brain"></i>
-                  </div>
-                  <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-400 ring-2 ring-[#081226] flex items-center justify-center">
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span>
+            <!-- ChatGPT SIDEBAR: Multi-Session History (Collapsible) -->
+            <aside id="ai-chat-sidebar" class="w-full md:w-72 lg:w-80 bg-[#030715] border-b md:border-b-0 md:border-r border-cyan-500/20 flex flex-col shrink-0 transition-all duration-300 z-20 hidden md:flex">
+              <!-- Sidebar Top: New Chat Button -->
+              <div class="p-3 border-b border-cyan-500/20 bg-[#060D1F]/90 flex items-center justify-between gap-2 shrink-0">
+                <button type="button" id="ai-new-chat-btn" class="flex-1 py-2.5 px-3 rounded-2xl bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-[0_0_18px_rgba(0,240,255,0.35)] transition-all active:scale-95 cursor-pointer">
+                  <i class="fa-solid fa-plus text-xs"></i>
+                  <span>New Chat</span>
+                </button>
+                <button type="button" id="ai-sidebar-close-mobile-btn" class="md:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 text-xs" title="Close Sidebar">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+
+              <!-- Persona Mode Selector -->
+              <div class="p-2.5 border-b border-cyan-500/15 bg-[#02050E]">
+                <div class="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                  <span>AI MODEL & PERSONA</span>
+                  <span class="text-emerald-400 font-mono text-[8px] flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>ONLINE</span>
                   </span>
                 </div>
-                <div>
-                  <div class="flex items-center gap-2">
-                    <h3 class="font-black text-sm sm:text-base text-white">Cyber Shield AI</h3>
-                    <span class="flex items-center gap-1 text-[9px] font-mono font-bold text-cyan-300 px-2 py-0.5 rounded-full bg-cyan-950/90 border border-cyan-400/40">
-                      <i class="fa-solid fa-bolt text-amber-400 text-[8px]"></i>
-                      <span>GEMINI INTELLIGENCE</span>
-                    </span>
-                  </div>
-                  <p class="text-[10px] sm:text-[11px] text-cyan-300/90 font-mono">Universal Q&A (Like Gemini & ChatGPT) • Hyper-Reliable Cyber Defense Specialist</p>
-                </div>
-              </div>
-
-              <!-- Header Action Controls -->
-              <div class="flex items-center gap-1.5">
-                <!-- Mode Switcher Pill -->
-                <div class="flex items-center p-0.5 rounded-xl bg-slate-900 border border-cyan-500/30 text-[10px] font-mono">
-                  <button type="button" id="ai-mode-cyber-btn" class="ai-mode-btn active px-2 py-1 rounded-lg bg-cyan-600 text-white font-bold transition-all cursor-pointer shadow">
-                    🛡️ Cyber Mode
+                <div class="grid grid-cols-2 gap-1 text-[10px] font-mono">
+                  <button type="button" id="ai-mode-cyber-btn" class="ai-mode-btn active p-2 rounded-xl bg-cyan-950 text-cyan-300 border border-cyan-500/50 font-bold flex items-center justify-center gap-1.5 cursor-pointer hover:bg-cyan-900/60 transition-all shadow-sm">
+                    <span>🛡️</span>
+                    <span class="truncate">Cyber Defense</span>
                   </button>
-                  <button type="button" id="ai-mode-general-btn" class="ai-mode-btn px-2 py-1 rounded-lg text-slate-400 hover:text-white transition-all cursor-pointer">
-                    🌐 General AI
+                  <button type="button" id="ai-mode-general-btn" class="ai-mode-btn p-2 rounded-xl bg-slate-900/80 text-slate-400 border border-slate-800 hover:text-white flex items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-800 transition-all">
+                    <span>✨</span>
+                    <span class="truncate">Gemini AI</span>
                   </button>
                 </div>
-
-                <!-- Voice Audio TTS Toggle -->
-                <button type="button" id="toggle-ai-tts-btn" class="w-8 h-8 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-slate-400 hover:text-cyan-300 flex items-center justify-center transition-colors text-xs cursor-pointer" title="Toggle AI Voice Audio (TTS)">
-                  <i id="ai-tts-icon" class="fa-solid fa-volume-high"></i>
-                </button>
-
-                <!-- Clear Chat -->
-                <button type="button" id="clear-ai-chat-btn" class="w-8 h-8 rounded-xl bg-slate-900 border border-slate-700 hover:border-red-500 text-slate-400 hover:text-red-400 flex items-center justify-center transition-colors text-xs cursor-pointer" title="Clear Chat History">
-                  <i class="fa-solid fa-trash-can"></i>
-                </button>
               </div>
-            </div>
 
-            <!-- Interactive Category Filter for Suggestion Prompts -->
-            <div class="px-3 pt-2 pb-1.5 bg-[#030816] border-b border-cyan-500/15 flex items-center justify-between gap-2 shrink-0">
-              <span class="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                <i class="fa-solid fa-wand-magic-sparkles text-cyan-400 text-[10px]"></i>
-                <span>SUGGESTED TOPICS:</span>
-              </span>
-              <div class="flex items-center gap-1 text-[10px] font-mono">
-                <button type="button" class="ai-cat-tab-btn active px-2 py-0.5 rounded-lg bg-cyan-950 text-cyan-300 border border-cyan-500/40 cursor-pointer" data-cat="scams">
-                  Scams
-                </button>
-                <button type="button" class="ai-cat-tab-btn px-2 py-0.5 rounded-lg text-slate-400 hover:text-white cursor-pointer" data-cat="safety">
-                  Safety
-                </button>
-                <button type="button" class="ai-cat-tab-btn px-2 py-0.5 rounded-lg text-slate-400 hover:text-white cursor-pointer" data-cat="drafts">
-                  Legal
-                </button>
-                <button type="button" class="ai-cat-tab-btn px-2 py-0.5 rounded-lg text-slate-400 hover:text-white cursor-pointer" data-cat="general">
-                  General Q&A
-                </button>
-              </div>
-            </div>
-
-            <!-- Dynamic Chips Bar -->
-            <div id="ai-chips-container" class="px-3 py-2 bg-[#020611] border-b border-slate-800/80 flex gap-2 overflow-x-auto scrollbar-thin shrink-0">
-              <!-- Default: Scams Category Chips -->
-              <button type="button" class="ai-quick-chip px-3 py-1.5 rounded-full bg-slate-900/90 hover:bg-cyan-950 border border-amber-500/40 text-amber-200 text-[10px] font-mono whitespace-nowrap cursor-pointer transition-all active:scale-95 flex items-center gap-1">
-                <span>⚡ Electricity Bill Disconnection threat</span>
-              </button>
-              <button type="button" class="ai-quick-chip px-3 py-1.5 rounded-full bg-slate-900/90 hover:bg-cyan-950 border border-red-500/40 text-red-200 text-[10px] font-mono whitespace-nowrap cursor-pointer transition-all active:scale-95 flex items-center gap-1">
-                <span>📦 Police / FedEx Digital Arrest Extortion</span>
-              </button>
-              <button type="button" class="ai-quick-chip px-3 py-1.5 rounded-full bg-slate-900/90 hover:bg-cyan-950 border border-cyan-500/40 text-cyan-200 text-[10px] font-mono whitespace-nowrap cursor-pointer transition-all active:scale-95 flex items-center gap-1">
-                <span>💼 Telegram Part-Time Like/Review Job</span>
-              </button>
-              <button type="button" class="ai-quick-chip px-3 py-1.5 rounded-full bg-slate-900/90 hover:bg-cyan-950 border border-purple-500/40 text-purple-200 text-[10px] font-mono whitespace-nowrap cursor-pointer transition-all active:scale-95 flex items-center gap-1">
-                <span>🏦 Bank KYC Expiring APK Download</span>
-              </button>
-            </div>
-
-            <!-- Scrollable Chat Stream Area -->
-            <div id="ai-chat-messages" class="flex-1 p-3.5 sm:p-5 overflow-y-auto space-y-4 font-sans text-xs sm:text-sm">
-              <!-- Initial Welcome Message from AI Counselor -->
-              <div class="flex items-start gap-3 max-w-[92%]">
-                <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-purple-600 via-indigo-600 to-cyan-500 text-white flex items-center justify-center text-sm shrink-0 mt-0.5 shadow-lg border border-cyan-300/40">
-                  <i class="fa-solid fa-shield-halved"></i>
+              <!-- Search Bar -->
+              <div class="p-2.5 border-b border-cyan-500/15">
+                <div class="relative">
+                  <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-[11px]"></i>
+                  <input type="text" id="ai-search-chats-input" placeholder="Search conversations..." class="w-full py-1.5 pl-8 pr-2.5 rounded-xl bg-slate-950/90 border border-slate-800 text-slate-200 placeholder-slate-500 text-[11px] font-sans focus:outline-none focus:border-cyan-500/50" />
                 </div>
-                <div class="p-4 rounded-3xl rounded-tl-sm bg-[#071329]/90 border border-cyan-500/30 text-slate-100 leading-relaxed shadow-xl space-y-2.5">
-                  <div class="flex items-center justify-between">
-                    <p class="font-extrabold text-white text-sm flex items-center gap-1.5">
-                      <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">Cyber Shield AI Intelligence</span>
-                    </p>
-                    <span class="px-2 py-0.5 rounded text-[8px] font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/40">ONLINE</span>
-                  </div>
-                  <p class="text-slate-200 text-xs sm:text-[13px] leading-relaxed">
-                    Hello! I am your AI Counselor and Digital Defender. Powered by Google Gemini, I can answer <strong>any question you have</strong> (like Gemini and ChatGPT), while providing <strong>specialized, high-reliability protection</strong> against scams, cyber fraud, and online extortion.
-                  </p>
-                  
-                  <div class="p-3 rounded-2xl bg-[#030814] border border-cyan-500/20 space-y-1.5 font-mono text-[11px]">
-                    <div class="text-cyan-300 font-bold flex items-center gap-1">
-                      <i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>
-                      <span>You can ask me anything:</span>
+              </div>
+
+              <!-- Saved Sessions List -->
+              <div class="flex-1 overflow-y-auto p-2.5 space-y-1.5 custom-scrollbar" id="ai-sessions-list">
+                <!-- Injected via JavaScript -->
+              </div>
+
+              <!-- Sidebar Footer -->
+              <div class="p-2.5 border-t border-cyan-500/20 bg-[#02050E] flex items-center justify-between text-[10px] font-mono text-slate-400 shrink-0">
+                <button type="button" id="ai-clear-all-sessions-btn" class="hover:text-red-400 flex items-center gap-1.5 transition-colors cursor-pointer" title="Delete all conversation history">
+                  <i class="fa-solid fa-trash-can text-[10px]"></i>
+                  <span>Clear All Chats</span>
+                </button>
+                <span class="text-[9px] text-cyan-500/70">Google Gemini 3.8</span>
+              </div>
+            </aside>
+
+            <!-- CHAT MAIN WORKSPACE CANVAS (Expansive ChatGPT Style) -->
+            <div class="flex-1 flex flex-col h-full overflow-hidden min-w-0 bg-[#030713]">
+              
+              <!-- Top Navbar -->
+              <div class="p-3 sm:px-5 border-b border-cyan-500/25 bg-[#060D1A]/95 backdrop-blur-xl flex items-center justify-between gap-2 shrink-0">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <button type="button" id="ai-sidebar-toggle-btn" class="p-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-slate-300 hover:text-cyan-300 transition-colors text-xs cursor-pointer shrink-0" title="Toggle Chat History">
+                    <i class="fa-solid fa-bars-staggered"></i>
+                  </button>
+
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                      <h3 id="ai-current-session-title" class="font-bold text-xs sm:text-sm text-white truncate max-w-[160px] sm:max-w-md">Cyber Shield AI</h3>
+                      <button type="button" id="ai-rename-session-btn" class="text-slate-500 hover:text-cyan-400 text-[10px] p-0.5 cursor-pointer" title="Rename Title">
+                        <i class="fa-solid fa-pencil"></i>
+                      </button>
                     </div>
-                    <ul class="space-y-1 text-slate-300 list-disc pl-4">
-                      <li>"Someone sent me an APK claiming to be SBI KYC update, is it safe?"</li>
-                      <li>"Draft an official police complaint for ₹35,000 lost to UPI fraud."</li>
-                      <li>"Explain quantum computing or solve a coding/math question."</li>
-                      <li>"How does 2FA and encryption protect my bank accounts?"</li>
-                    </ul>
+                    <div class="flex items-center gap-2 text-[9px] sm:text-[10px] font-mono text-cyan-300/80">
+                      <span id="ai-active-mode-badge" class="flex items-center gap-1 text-emerald-400">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>Multi-Turn Memory Active</span>
+                      </span>
+                      <span>•</span>
+                      <span class="text-slate-400">Google Gemini</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right Header Actions -->
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <!-- Language Selector Pill -->
+                  <div class="flex items-center p-0.5 rounded-xl bg-slate-900 border border-slate-700 text-[10px] font-mono">
+                    <button type="button" class="ai-lang-pill-btn active px-2 py-0.5 rounded-lg text-cyan-300 bg-cyan-950 font-bold cursor-pointer" data-lang="en">EN</button>
+                    <button type="button" class="ai-lang-pill-btn px-2 py-0.5 rounded-lg text-slate-400 hover:text-white cursor-pointer" data-lang="ta">தமிழ்</button>
+                    <button type="button" class="ai-lang-pill-btn px-2 py-0.5 rounded-lg text-slate-400 hover:text-white cursor-pointer" data-lang="hi">हिंदी</button>
                   </div>
 
-                  <p class="text-[10px] text-cyan-400/80 font-mono">
-                    🌐 Fluently understands English, தமிழ் (Tamil), and हिंदी (Hindi). Type your question or use the 🎤 Voice button below!
-                  </p>
-                </div>
-              </div>
-            </div>
+                  <!-- Fullscreen / Expand Toggle Button -->
+                  <button type="button" id="ai-fullscreen-toggle-btn" class="w-8 h-8 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-slate-400 hover:text-cyan-300 flex items-center justify-center transition-colors text-xs cursor-pointer" title="Toggle Fullscreen Mode">
+                    <i id="ai-fullscreen-icon" class="fa-solid fa-expand"></i>
+                  </button>
 
-            <!-- High-Tech Animated Typing Indicator -->
-            <div id="ai-typing-indicator" class="hidden px-4 py-2 bg-gradient-to-r from-cyan-950/40 to-transparent border-t border-cyan-500/20">
-              <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-950/80 border border-cyan-400/50 text-cyan-200 text-xs font-mono shadow-[0_0_15px_rgba(0,240,255,0.25)]">
-                <span class="flex gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce"></span>
-                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:0.2s]"></span>
-                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:0.4s]"></span>
-                </span>
-                <span id="ai-typing-text">Gemini Neural Engine analyzing query...</span>
-              </div>
-            </div>
+                  <!-- Export Conversation Button -->
+                  <button type="button" id="ai-export-chat-btn" class="w-8 h-8 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-slate-400 hover:text-cyan-300 flex items-center justify-center transition-colors text-xs cursor-pointer" title="Export Conversation (Markdown)">
+                    <i class="fa-solid fa-download"></i>
+                  </button>
 
-            <!-- Ergonomic Input Console Dock -->
-            <div class="p-3 bg-[#060D1A]/95 border-t border-cyan-500/30 shrink-0 space-y-1.5">
-              <div class="flex items-center justify-between px-1 text-[9px] font-mono text-slate-400">
-                <span class="flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                  <span id="ai-input-mode-label">Mode: Cyber Defense & General AI</span>
-                </span>
-                <span>Press Enter to send • Shift+Enter for newline</span>
-              </div>
+                  <!-- Voice Audio TTS Toggle -->
+                  <button type="button" id="toggle-ai-tts-btn" class="w-8 h-8 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-slate-400 hover:text-cyan-300 flex items-center justify-center transition-colors text-xs cursor-pointer" title="Toggle Auto Read Aloud (TTS)">
+                    <i id="ai-tts-icon" class="fa-solid fa-volume-high"></i>
+                  </button>
 
-              <form id="ai-chat-form" class="flex items-end gap-2">
-                <div class="relative flex-1">
-                  <textarea id="ai-chat-input" rows="1" placeholder="Ask anything: scam analysis, legal drafts, or general questions (English, தமிழ், हिंदी)..." class="w-full py-2.5 px-3.5 pr-10 rounded-2xl bg-[#020611] border border-cyan-500/40 text-white placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 resize-none max-h-28 custom-scrollbar leading-relaxed" style="min-height: 44px;"></textarea>
-                  
-                  <!-- Voice Dictation (Speech-to-Text) Button -->
-                  <button type="button" id="ai-voice-input-btn" class="absolute right-2.5 bottom-2.5 text-slate-400 hover:text-cyan-300 p-1 rounded-lg transition-colors cursor-pointer" title="Voice Input (Speech-to-Text)">
-                    <i class="fa-solid fa-microphone text-xs"></i>
+                  <!-- Clear Current Chat -->
+                  <button type="button" id="clear-ai-chat-btn" class="w-8 h-8 rounded-xl bg-slate-900 border border-slate-700 hover:border-red-500 text-slate-400 hover:text-red-400 flex items-center justify-center transition-colors text-xs cursor-pointer" title="Clear Current Chat">
+                    <i class="fa-solid fa-trash-can"></i>
                   </button>
                 </div>
+              </div>
 
-                <!-- Send Button -->
-                <button type="submit" id="ai-chat-send-btn" class="h-11 w-11 rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-indigo-600 hover:from-blue-500 hover:to-cyan-400 text-white flex items-center justify-center text-sm shadow-[0_0_20px_rgba(0,240,255,0.4)] active:scale-95 transition-all cursor-pointer shrink-0" aria-label="Send Message">
-                  <i class="fa-solid fa-paper-plane text-xs"></i>
-                </button>
-              </form>
+              <!-- Prompt Starter Categories Filter Bar -->
+              <div class="px-4 py-2 bg-[#020612] border-b border-cyan-500/15 flex items-center justify-between gap-2 shrink-0">
+                <span class="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <i class="fa-solid fa-wand-magic-sparkles text-cyan-400 text-[10px]"></i>
+                  <span>SUGGESTED TOPICS:</span>
+                </span>
+                <div class="flex items-center gap-1.5 text-[10px] font-mono overflow-x-auto scrollbar-none">
+                  <button type="button" class="ai-cat-tab-btn active px-2.5 py-1 rounded-xl bg-cyan-950 text-cyan-300 border border-cyan-500/40 cursor-pointer whitespace-nowrap" data-cat="scams">
+                    🛡️ Scam Triage
+                  </button>
+                  <button type="button" class="ai-cat-tab-btn px-2.5 py-1 rounded-xl text-slate-400 hover:text-white cursor-pointer whitespace-nowrap" data-cat="safety">
+                    🔒 Daily Safety
+                  </button>
+                  <button type="button" class="ai-cat-tab-btn px-2.5 py-1 rounded-xl text-slate-400 hover:text-white cursor-pointer whitespace-nowrap" data-cat="drafts">
+                    📝 Police FIR
+                  </button>
+                  <button type="button" class="ai-cat-tab-btn px-2.5 py-1 rounded-xl text-slate-400 hover:text-white cursor-pointer whitespace-nowrap" data-cat="general">
+                    💡 Everyday AI
+                  </button>
+                </div>
+              </div>
+
+              <!-- Prompt Chips Bar -->
+              <div id="ai-chips-container" class="px-4 py-2 bg-[#01040d] border-b border-slate-800/80 flex gap-2 overflow-x-auto scrollbar-thin shrink-0">
+                <!-- Dynamically rendered based on active category -->
+              </div>
+
+              <!-- Message Stream Area (Centered Column like ChatGPT & Gemini) -->
+              <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-between">
+                <div id="ai-chat-messages" class="w-full max-w-3xl lg:max-w-4xl mx-auto px-3 sm:px-6 py-4 space-y-5 font-sans text-xs sm:text-sm flex-1">
+                  <!-- Rendered dynamically -->
+                </div>
+
+                <!-- High-Tech Animated Typing Indicator with Stop Button -->
+                <div id="ai-typing-indicator" class="hidden w-full max-w-3xl lg:max-w-4xl mx-auto px-4 py-2.5 flex items-center justify-between shrink-0">
+                  <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-cyan-950/90 border border-cyan-400/50 text-cyan-200 text-xs font-mono shadow-[0_0_20px_rgba(0,240,255,0.25)]">
+                    <span class="flex gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce"></span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:0.2s]"></span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:0.4s]"></span>
+                    </span>
+                    <span id="ai-typing-text">Gemini is thinking...</span>
+                  </div>
+                  <button type="button" id="ai-stop-generation-btn" class="px-3 py-1 rounded-xl bg-red-950 hover:bg-red-900 border border-red-500/40 text-red-300 text-xs font-mono font-bold flex items-center gap-1.5 cursor-pointer shadow transition-all">
+                    <i class="fa-solid fa-stop text-[10px]"></i>
+                    <span>Stop</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Ergonomic & Convenient Prompt Bar Dock (Like ChatGPT & Gemini) -->
+              <div class="w-full max-w-3xl lg:max-w-4xl mx-auto px-3 sm:px-5 pb-3 sm:pb-4 pt-1 shrink-0 space-y-2">
+                
+                <!-- Voice-Interactive Triage Live Recording Status Banner -->
+                <div id="ai-voice-triage-status" class="hidden px-4 py-2.5 rounded-2xl bg-gradient-to-r from-red-950/95 via-rose-950/90 to-[#0c0514]/95 border border-red-500/50 flex items-center justify-between text-xs font-mono text-red-200 shadow-[0_0_25px_rgba(244,63,94,0.4)] transition-all">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <span class="flex gap-1 items-end h-4 shrink-0">
+                      <span class="w-1 bg-red-400 rounded-full animate-bounce [animation-duration:0.6s] h-3"></span>
+                      <span class="w-1 bg-rose-400 rounded-full animate-bounce [animation-duration:0.8s] h-4"></span>
+                      <span class="w-1 bg-amber-400 rounded-full animate-bounce [animation-duration:0.5s] h-2"></span>
+                      <span class="w-1 bg-red-300 rounded-full animate-bounce [animation-duration:0.7s] h-3.5"></span>
+                    </span>
+                    <div class="min-w-0">
+                      <div class="font-bold text-[11px] text-red-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-satellite-dish text-[10px] animate-spin-slow"></i>
+                        <span>VOICE TRIAGE RECORDING...</span>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-900/90 border border-red-500/40 text-red-100 font-sans">Speak your concern</span>
+                      </div>
+                      <p id="ai-voice-triage-transcript-preview" class="text-[10px] text-slate-300 truncate max-w-xs sm:max-w-md italic">Listening for speech via Web Speech API...</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0 ml-2">
+                    <button type="button" id="ai-voice-triage-submit-btn" class="px-3 py-1 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-[10px] flex items-center gap-1 cursor-pointer shadow active:scale-95 transition-all">
+                      <i class="fa-solid fa-paper-plane text-[9px]"></i>
+                      <span>Send Now</span>
+                    </button>
+                    <button type="button" id="ai-voice-triage-cancel-btn" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[10px] cursor-pointer active:scale-95 transition-all">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Convenient Floating Input Bar Container -->
+                <div class="rounded-3xl bg-[#091224]/95 border border-cyan-500/40 shadow-[0_10px_35px_rgba(0,0,0,0.6)] focus-within:border-cyan-400 focus-within:ring-2 focus-within:ring-cyan-500/30 p-2 sm:p-2.5 transition-all">
+                  <form id="ai-chat-form" class="flex flex-col gap-2">
+                    
+                    <!-- Expanding Textarea -->
+                    <div class="relative w-full">
+                      <textarea id="ai-chat-input" rows="1" placeholder="Message Cyber Shield AI... (like ChatGPT & Gemini) — Ask anything, paste suspicious messages, or speak" class="w-full py-2 px-3 rounded-2xl bg-transparent text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none resize-none max-h-40 custom-scrollbar leading-relaxed" style="min-height: 44px;"></textarea>
+                    </div>
+
+                    <!-- Convenient Bottom Action Toolbar -->
+                    <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/80">
+                      
+                      <!-- Left Tools: Voice Triage Button + Voice Dictation Mic + Mode Tag -->
+                      <div class="flex items-center gap-1.5 min-w-0">
+                        <!-- Voice-Interactive Triage Button (Active in Cyber Defense Mode) -->
+                        <button type="button" id="ai-voice-triage-btn" class="h-9 px-3 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-rose-500 text-white font-mono text-xs font-bold flex items-center gap-2 shadow-[0_0_18px_rgba(244,63,94,0.35)] border border-red-400/40 active:scale-95 transition-all cursor-pointer shrink-0" title="Voice Triage: Speak your concern to analyze immediately">
+                          <span class="relative flex h-2 w-2">
+                            <span id="ai-voice-triage-ping" class="hidden animate-ping absolute inline-flex h-full w-full rounded-full bg-red-300 opacity-75"></span>
+                            <span id="ai-voice-triage-dot" class="inline-flex rounded-full h-2 w-2 bg-white"></span>
+                          </span>
+                          <i id="ai-voice-triage-icon" class="fa-solid fa-shield-halved text-xs text-amber-200"></i>
+                          <span id="ai-voice-triage-label" class="text-[11px] font-bold tracking-tight whitespace-nowrap">Voice Triage</span>
+                        </button>
+
+                        <!-- Voice Dictation (Speech-to-Text) Button -->
+                        <button type="button" id="ai-voice-input-btn" class="h-9 w-9 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-cyan-300 border border-slate-700 hover:border-cyan-400/50 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Voice Dictation (Speech-to-Text)">
+                          <i id="ai-voice-icon" class="fa-solid fa-microphone text-xs"></i>
+                        </button>
+
+                        <!-- Active Mode Pill -->
+                        <span id="ai-input-mode-label" class="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono text-cyan-300/80 bg-cyan-950/40 border border-cyan-500/20 px-2 py-1 rounded-lg truncate max-w-[200px]">
+                          🛡️ Cyber Defense
+                        </span>
+                      </div>
+
+                      <!-- Right Tools: Keyboard shortcut hint + Send / Stop Button -->
+                      <div class="flex items-center gap-2 shrink-0">
+                        <span class="hidden md:inline text-[9px] font-mono text-slate-500">
+                          Enter to send • Shift+Enter for newline
+                        </span>
+
+                        <!-- Send / Stop Button -->
+                        <button type="submit" id="ai-chat-send-btn" class="h-9 w-9 sm:h-9 sm:w-10 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-500 to-indigo-600 hover:from-blue-500 hover:to-cyan-400 text-white flex items-center justify-center text-xs shadow-[0_0_20px_rgba(0,240,255,0.4)] active:scale-95 transition-all cursor-pointer" aria-label="Send Message">
+                          <i id="ai-send-icon" class="fa-solid fa-paper-plane text-xs"></i>
+                        </button>
+                      </div>
+
+                    </div>
+
+                  </form>
+                </div>
+
+                <div class="text-center text-[10px] text-slate-500 font-sans">
+                  Cyber Shield AI can make mistakes. For financial scams, always dial <span class="text-red-400 font-bold">1930</span> immediately.
+                </div>
+
+              </div>
+
             </div>
-
           </div>
         </section>
 
@@ -1397,75 +1502,7 @@
           </div>
         </section>
 
-        <!-- ============================================================== -->
-        <!-- VIEW 4: THREAT RADAR (LIVE MAP & NATIONAL FEED)                -->
-        <!-- ============================================================== -->
-        <section id="view-radar" class="app-view hidden space-y-4">
-          <div class="tilt-card p-4 rounded-2xl bg-[#081226]/85 border border-cyan-500/20 space-y-3">
-            <div class="flex items-center justify-between">
-              <div>
-                <h2 class="text-base font-extrabold text-white flex items-center gap-2">
-                  <i class="fa-solid fa-radar text-red-400 animate-spin-slow"></i>
-                  National Cyber Threat Radar
-                </h2>
-                <p class="text-xs text-slate-300">Live crowdsourced scam wave telemetry across Indian states.</p>
-              </div>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-red-950 text-red-300 border border-red-500/40 animate-pulse">
-                LIVE FEED
-              </span>
-            </div>
 
-            <!-- Radar Visual Widget -->
-            <div class="relative h-48 rounded-2xl bg-[#030712] border border-cyan-500/30 overflow-hidden flex items-center justify-center">
-              <div class="absolute inset-0 bg-[radial-gradient(#081a36_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
-              
-              <!-- Radar Sweep Cone -->
-              <div class="w-40 h-40 rounded-full border border-cyan-400/40 relative flex items-center justify-center">
-                <div class="w-28 h-28 rounded-full border border-cyan-500/30"></div>
-                <div class="w-16 h-16 rounded-full border border-cyan-500/20"></div>
-                <div class="w-2 h-2 rounded-full bg-cyan-300"></div>
-                
-                <div class="absolute inset-0 rounded-full overflow-hidden animate-radar-sweep">
-                  <div class="w-1/2 h-1/2 bg-gradient-to-br from-cyan-400/30 to-transparent origin-bottom-right"></div>
-                </div>
-
-                <!-- Threat Blips -->
-                <div class="absolute top-6 right-8 w-2 h-2 rounded-full bg-red-500 animate-ping" title="Delhi: Electricity Scam Wave"></div>
-                <div class="absolute bottom-8 left-10 w-2 h-2 rounded-full bg-red-500 animate-ping" title="Tamil Nadu: SBI APK Wave"></div>
-                <div class="absolute top-12 left-12 w-2 h-2 rounded-full bg-amber-400 animate-pulse" title="Maharashtra: Digital Arrest"></div>
-              </div>
-
-              <div class="absolute bottom-2 left-3 text-[10px] font-mono text-cyan-300">
-                ACTIVE HOTSPOTS: CHENNAI, MUMBAI, DELHI-NCR, BENGALURU
-              </div>
-            </div>
-          </div>
-
-          <!-- Radar Alerts Feed -->
-          <div class="space-y-2">
-            <div class="p-3 rounded-2xl bg-[#081226]/85 border border-red-500/40 space-y-1">
-              <div class="flex items-center justify-between text-xs">
-                <span class="font-bold text-white flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                  Fake SBI APK Campaign (Wedding_Card.apk)
-                </span>
-                <span class="text-[10px] font-mono text-red-400 font-bold">HIGH SEVERITY</span>
-              </div>
-              <p class="text-xs text-slate-300">Malware circulating via WhatsApp masquerading as wedding cards. Steals SMS OTPs silently.</p>
-            </div>
-
-            <div class="p-3 rounded-2xl bg-[#081226]/85 border border-amber-500/40 space-y-1">
-              <div class="flex items-center justify-between text-xs">
-                <span class="font-bold text-white flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                  Digital Arrest & CBI Extortion Threat
-                </span>
-                <span class="text-[10px] font-mono text-amber-400 font-bold">METRO CITIES</span>
-              </div>
-              <p class="text-xs text-slate-300">Fake Skype calls posing as Mumbai Police / CBI alleging narcotics parcel sent in user's name.</p>
-            </div>
-          </div>
-        </section>
 
         <!-- ============================================================== -->
         <!-- VIEW 5: SCAM IQ QUIZ                                           -->
@@ -2581,6 +2618,76 @@
     </div>
 
     <!-- ============================================================== -->
+    <!-- 14. INTERACTIVE STEP-BY-STEP ONBOARDING WALKTHROUGH MODAL     -->
+    <!-- ============================================================== -->
+    <div id="onboarding-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden opacity-0 flex items-center justify-center p-3 sm:p-4 transition-all duration-300">
+      <div class="w-full max-w-xl bg-[#070D19] border-2 border-cyan-400/60 rounded-3xl p-4 sm:p-6 shadow-[0_0_60px_rgba(0,240,255,0.25)] text-white space-y-4 relative max-h-[92vh] overflow-y-auto">
+        
+        <!-- Top Controls: Close & Skip -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+            <span class="text-[10px] font-mono font-bold tracking-wider text-cyan-300 uppercase">Interactive Citizen Onboarding Guide</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" id="skip-onboarding-btn" class="text-[11px] font-mono text-slate-400 hover:text-slate-200 px-2 py-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer">
+              Skip Tour
+            </button>
+            <button type="button" id="close-onboarding-btn" class="w-7 h-7 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer" aria-label="Close walkthrough">
+              <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Progress Tracker Bar (5 Steps) -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span id="onboarding-step-counter" class="text-cyan-300 font-bold">STEP 1 OF 5</span>
+            <span id="onboarding-step-badge" class="px-2 py-0.5 rounded-full text-[9px] font-black bg-cyan-950 text-cyan-300 border border-cyan-400/40">WELCOME</span>
+          </div>
+          <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden flex gap-1 p-0.5">
+            <div id="ob-bar-1" class="flex-1 bg-cyan-400 rounded-full transition-all duration-300"></div>
+            <div id="ob-bar-2" class="flex-1 bg-slate-800 rounded-full transition-all duration-300"></div>
+            <div id="ob-bar-3" class="flex-1 bg-slate-800 rounded-full transition-all duration-300"></div>
+            <div id="ob-bar-4" class="flex-1 bg-slate-800 rounded-full transition-all duration-300"></div>
+            <div id="ob-bar-5" class="flex-1 bg-slate-800 rounded-full transition-all duration-300"></div>
+          </div>
+        </div>
+
+        <!-- Dynamic Step Card Container -->
+        <div id="onboarding-card-body" class="p-4 sm:p-5 rounded-2xl bg-[#040814] border border-cyan-500/30 space-y-4">
+          <!-- Dynamically populated via renderOnboardingStep() -->
+        </div>
+
+        <!-- Step Interactive Live Preview Sandbox -->
+        <div id="onboarding-sandbox" class="p-3.5 rounded-xl bg-[#0a1428] border border-cyan-500/20 text-xs space-y-2">
+          <!-- Dynamically populated sandbox preview -->
+        </div>
+
+        <!-- Navigation Buttons: Back, Next, Action, Finish -->
+        <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 border-t border-slate-800">
+          <button type="button" id="onboarding-prev-btn" class="order-2 sm:order-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+            <i class="fa-solid fa-arrow-left text-[10px]"></i>
+            <span>Previous</span>
+          </button>
+
+          <div class="order-1 sm:order-2 flex flex-1 sm:flex-initial gap-2">
+            <button type="button" id="onboarding-action-btn" class="flex-1 sm:flex-initial py-2.5 px-4 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-400/50 text-cyan-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+              <i id="onboarding-action-icon" class="fa-solid fa-play text-[10px]"></i>
+              <span id="onboarding-action-label">Try Threat Scanner</span>
+            </button>
+
+            <button type="button" id="onboarding-next-btn" class="flex-1 sm:flex-initial py-2.5 px-5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all cursor-pointer">
+              <span id="onboarding-next-label">Next Step</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
     <!-- 11. COMPLETE VANILLA JAVASCRIPT ENGINE                          -->
     <!-- ============================================================== -->
     <script>
@@ -3427,6 +3534,22 @@
 
           const target = document.getElementById(`view-${viewName}`);
           if (target) target.classList.remove('hidden');
+
+          // Dynamically expand layout when entering AI Assistant (ChatGPT / Gemini full-size canvas)
+          const mainApp = document.getElementById('main-app');
+          if (mainApp) {
+            if (viewName === 'ai-assistant') {
+              mainApp.classList.remove('max-w-xl');
+              mainApp.classList.add('max-w-5xl', 'lg:max-w-6xl', 'xl:max-w-7xl', 'w-full');
+              setTimeout(() => {
+                const inp = document.getElementById('ai-chat-input');
+                if (inp) inp.focus();
+              }, 100);
+            } else {
+              mainApp.classList.remove('max-w-5xl', 'lg:max-w-6xl', 'xl:max-w-7xl', 'w-full');
+              mainApp.classList.add('max-w-xl');
+            }
+          }
 
           document.querySelectorAll('.nav-tab-btn').forEach(btn => {
             if (btn.getAttribute('data-view') === viewName) {
@@ -4756,333 +4879,1831 @@
         }
 
         // ========================================================
-        // 17. CYBER SHIELD AI COUNSELOR & LEGAL DRAFTER ENGINE
+        // 17. FULL-FEATURED CHATGPT AI ASSISTANT & CYBER ENGINE
         // ========================================================
+        const AI_SESSIONS_STORAGE_KEY = 'scamshield_ai_chat_sessions_v2';
+        const AI_CURRENT_SESSION_KEY = 'scamshield_ai_current_session_id';
+
+        let activeAiMode = 'cyber'; // 'cyber' | 'general'
+        let isAiTtsActive = false;
+        let aiSpeechRecognition = null;
+        let isAiVoiceRecording = false;
+        let aiAbortController = null;
+        let isAiGenerating = false;
+        let activePromptCategory = 'scams';
+
+        // DOM Element References
         const aiChatForm = document.getElementById('ai-chat-form');
         const aiChatInput = document.getElementById('ai-chat-input');
+        const aiChatSendBtn = document.getElementById('ai-chat-send-btn');
+        const aiSendIcon = document.getElementById('ai-send-icon');
         const aiChatMessages = document.getElementById('ai-chat-messages');
         const aiTypingIndicator = document.getElementById('ai-typing-indicator');
+        const aiTypingText = document.getElementById('ai-typing-text');
+        const aiStopGenBtn = document.getElementById('ai-stop-generation-btn');
         const clearAiChatBtn = document.getElementById('clear-ai-chat-btn');
+        const aiChatSidebar = document.getElementById('ai-chat-sidebar');
+        const aiSidebarToggleBtn = document.getElementById('ai-sidebar-toggle-btn');
+        const aiSidebarCloseMobileBtn = document.getElementById('ai-sidebar-close-mobile-btn');
+        const aiNewChatBtn = document.getElementById('ai-new-chat-btn');
+        const aiSessionsList = document.getElementById('ai-sessions-list');
+        const aiSearchChatsInput = document.getElementById('ai-search-chats-input');
+        const aiClearAllSessionsBtn = document.getElementById('ai-clear-all-sessions-btn');
+        const aiCurrentSessionTitle = document.getElementById('ai-current-session-title');
+        const aiRenameSessionBtn = document.getElementById('ai-rename-session-btn');
+        const aiModeCyberBtn = document.getElementById('ai-mode-cyber-btn');
+        const aiModeGeneralBtn = document.getElementById('ai-mode-general-btn');
+        const toggleAiTtsBtn = document.getElementById('toggle-ai-tts-btn');
+        const aiTtsIcon = document.getElementById('ai-tts-icon');
+        const aiExportChatBtn = document.getElementById('ai-export-chat-btn');
+        const aiChipsContainer = document.getElementById('ai-chips-container');
+        const aiVoiceInputBtn = document.getElementById('ai-voice-input-btn');
+        const aiVoiceIcon = document.getElementById('ai-voice-icon');
+        const aiInputModeLabel = document.getElementById('ai-input-mode-label');
+
+        // Voice-Interactive Triage State & Web Speech API Elements
+        let isVoiceTriageRecording = false;
+        let voiceTriageRecognition = null;
+        let voiceTriageTranscript = '';
+
+        const aiVoiceTriageBtn = document.getElementById('ai-voice-triage-btn');
+        const aiVoiceTriageIcon = document.getElementById('ai-voice-triage-icon');
+        const aiVoiceTriageLabel = document.getElementById('ai-voice-triage-label');
+        const aiVoiceTriagePing = document.getElementById('ai-voice-triage-ping');
+        const aiVoiceTriageDot = document.getElementById('ai-voice-triage-dot');
+        const aiVoiceTriageStatus = document.getElementById('ai-voice-triage-status');
+        const aiVoiceTriagePreview = document.getElementById('ai-voice-triage-transcript-preview');
+        const aiVoiceTriageSubmitBtn = document.getElementById('ai-voice-triage-submit-btn');
+        const aiVoiceTriageCancelBtn = document.getElementById('ai-voice-triage-cancel-btn');
+
+        // Preset Prompt Starters categorized like ChatGPT & Gemini (No coding, citizen-focused)
+        const AI_PROMPT_CATEGORIES = {
+          scams: [
+            { icon: '⚡', label: 'Electricity Disconnection SMS Trap', prompt: 'I received an SMS: "Dear customer, your electricity will be disconnected tonight at 9:30 PM by electricity officer. Call 9876543210 immediately." Is this a scam?' },
+            { icon: '📦', label: 'FedEx / Police Digital Arrest Call', prompt: 'Someone in a police uniform on WhatsApp video call claimed a FedEx parcel with narcotics in my name was seized and placed me under "Digital Arrest". What should I do?' },
+            { icon: '💼', label: 'Telegram Work-From-Home Task Racket', prompt: 'A Telegram group offered ₹500 for liking YouTube videos, then demanded I deposit ₹25,000 for VIP tasks. Is this a legitimate job?' },
+            { icon: '🏦', label: 'Bank KYC Expiring APK Dropper', prompt: 'I got a text saying "SBI account blocked. Click bit.ly/sbi-kyc-update.apk to update PAN card". What will happen if someone installs this APK?' },
+            { icon: '💸', label: 'UPI PIN to "Receive" Funds Scam', prompt: 'A buyer on OLX sent me a QR code and asked me to enter my UPI PIN to receive payment of ₹10,000. Is entering a UPI PIN safe?' }
+          ],
+          safety: [
+            { icon: '🔒', label: 'Golden Rules: Never Share Bank OTP or PIN', prompt: 'Explain why legitimate bank officers never ask for OTPs or PINs over the phone or SMS. How can I protect my family and elders from falling for this?' },
+            { icon: '📞', label: 'How to Spot Fake Bank & Courier Calls', prompt: 'What are the top warning signs of fake phone calls claiming to be from FedEx, TRAI, Police, or my bank manager threatening to suspend my account?' },
+            { icon: '📱', label: 'Lost or Stolen Phone Emergency Protocol', prompt: 'If my smartphone is stolen or lost, what immediate steps must I take to block my UPI, net banking, SIM card, and IMEI number?' },
+            { icon: '🛡️', label: 'How to Secure WhatsApp & Social Accounts', prompt: 'Give me simple step-by-step guidance to turn on Two-Factor Authentication (2FA) and protect my WhatsApp and email accounts from being hacked.' }
+          ],
+          drafts: [
+            { icon: '📄', label: 'Draft Cyber Police FIR for ₹35,000 UPI Fraud', prompt: 'Please draft an official, ready-to-file Cyber Crime Police Complaint under Section 66D IT Act for ₹35,000 stolen via a fake UPI refund link.' },
+            { icon: '💳', label: 'RBI Zero Liability 3-Day Bank Letter', prompt: 'Draft a formal dispute letter to my bank manager claiming Zero Liability under RBI circular for an unauthorized debit reported within 24 hours.' },
+            { icon: '🛑', label: 'Draft Notice against WhatsApp Extortionist', prompt: 'Draft a strict legal warning notice to an online blackmailer threatening to circulate morphed photos, citing BNS and IT Act penal provisions.' },
+            { icon: '📋', label: 'Golden Hour Evidence Collection Checklist', prompt: 'Give me the step-by-step Golden Hour evidence checklist needed before calling 1930 National Cyber Crime Reporting Portal.' }
+          ],
+          general: [
+            { icon: '🧠', label: 'How Do Scam Callers Manipulate Minds?', prompt: 'Explain the psychological tricks that scam callers use (fear, false urgency, authority bias) to make smart people panic and transfer money.' },
+            { icon: '🌐', label: 'How Does Google Gemini Understand Humans?', prompt: 'Explain how conversational AI like Gemini understands questions and provides helpful advice in everyday language.' },
+            { icon: '🗣️', label: 'Essential Tamil Banking Safety Phrases', prompt: 'Teach me essential Tamil (தமிழ்) phrases with English pronunciation for reporting bank fraud and speaking to police.' },
+            { icon: '✍️', label: 'Polite Formal Dispute Email Draft', prompt: 'Write a polite, firm dispute email to an online shopping merchant that delivered a counterfeit product and refused an immediate refund.' }
+          ]
+        };
+
+        // Storage Operations
+        function getAiSessions() {
+          try {
+            const raw = localStorage.getItem(AI_SESSIONS_STORAGE_KEY);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+          } catch (e) {}
+          // Default initial session
+          const initial = [{
+            id: 'sess_' + Date.now(),
+            title: 'Welcome to Cyber Shield AI',
+            mode: 'cyber',
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            messages: []
+          }];
+          saveAiSessions(initial);
+          return initial;
+        }
+
+        function saveAiSessions(sessions) {
+          try {
+            localStorage.setItem(AI_SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
+          } catch (e) {}
+        }
+
+        function getCurrentSessionId() {
+          let id = localStorage.getItem(AI_CURRENT_SESSION_KEY);
+          const sessions = getAiSessions();
+          if (!id || !sessions.find(s => s.id === id)) {
+            id = sessions[0].id;
+            localStorage.setItem(AI_CURRENT_SESSION_KEY, id);
+          }
+          return id;
+        }
+
+        function setCurrentSessionId(id) {
+          localStorage.setItem(AI_CURRENT_SESSION_KEY, id);
+          renderAiSessionView();
+          renderAiSessionsSidebar();
+        }
+
+        function getCurrentSession() {
+          const sessions = getAiSessions();
+          const currentId = getCurrentSessionId();
+          return sessions.find(s => s.id === currentId) || sessions[0];
+        }
+
+        function updateCurrentSession(mutatorFn) {
+          const sessions = getAiSessions();
+          const currentId = getCurrentSessionId();
+          const idx = sessions.findIndex(s => s.id === currentId);
+          if (idx !== -1) {
+            mutatorFn(sessions[idx]);
+            sessions[idx].updatedAt = Date.now();
+            saveAiSessions(sessions);
+            renderAiSessionsSidebar();
+          }
+        }
+
+        // Markdown Parsing Engine with Code Block Highlighting & Fallback
+        function renderMarkdownToHtml(markdownText) {
+          if (!markdownText) return '';
+          
+          let html = '';
+          // Try Marked.js if loaded
+          if (window.marked && typeof window.marked.parse === 'function') {
+            try {
+              html = window.marked.parse(markdownText, { gfm: true, breaks: true });
+            } catch (err) {
+              html = simpleMarkdownFallback(markdownText);
+            }
+          } else {
+            html = simpleMarkdownFallback(markdownText);
+          }
+
+          // Style any preformatted text blocks as official legal/police document templates (No programming code)
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = html;
+
+          tempDiv.querySelectorAll('pre').forEach((preBlock) => {
+            const codeEl = preBlock.querySelector('code');
+            const docContent = (codeEl ? codeEl.textContent : preBlock.textContent).trim();
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'my-3 rounded-2xl bg-[#030919] border border-cyan-500/30 overflow-hidden shadow-lg';
+            
+            const headerBar = document.createElement('div');
+            headerBar.className = 'flex items-center justify-between px-3.5 py-2 bg-[#061226] border-b border-cyan-500/20 text-[11px] font-sans text-cyan-200';
+            headerBar.innerHTML = `
+              <span class="flex items-center gap-2 font-bold text-cyan-300">
+                <i class="fa-solid fa-file-lines text-cyan-400"></i>
+                <span>Official Draft / Formal Template</span>
+              </span>
+              <button type="button" class="ai-copy-doc-btn hover:text-white px-2.5 py-1 rounded-lg bg-cyan-950/80 border border-cyan-500/30 flex items-center gap-1.5 cursor-pointer transition-colors text-[10px] font-mono text-cyan-200" data-text="${encodeURIComponent(docContent)}">
+                <i class="fa-solid fa-copy"></i>
+                <span>Copy Draft</span>
+              </button>
+            `;
+
+            preBlock.className = 'p-3.5 text-xs font-sans text-slate-100 overflow-x-auto whitespace-pre-wrap leading-relaxed custom-scrollbar bg-transparent';
+            
+            wrapper.appendChild(headerBar);
+            preBlock.parentNode?.insertBefore(wrapper, preBlock);
+            wrapper.appendChild(preBlock);
+          });
+
+          // Style blockquotes
+          tempDiv.querySelectorAll('blockquote').forEach(bq => {
+            bq.className = 'p-3 my-2 border-l-4 border-cyan-400 bg-cyan-950/30 rounded-r-2xl text-slate-200 text-xs sm:text-sm italic leading-relaxed';
+          });
+
+          // Style tables
+          tempDiv.querySelectorAll('table').forEach(tbl => {
+            tbl.className = 'w-full my-3 text-left border-collapse text-xs border border-cyan-500/30 rounded-xl overflow-hidden';
+            tbl.querySelectorAll('th').forEach(th => th.className = 'p-2.5 bg-[#081734] text-cyan-300 font-bold border-b border-cyan-500/30');
+            tbl.querySelectorAll('td').forEach(td => td.className = 'p-2.5 border-b border-slate-800 text-slate-200');
+          });
+
+          // Style lists
+          tempDiv.querySelectorAll('ul').forEach(ul => ul.className = 'list-disc pl-5 space-y-1.5 my-2.5 text-slate-200');
+          tempDiv.querySelectorAll('ol').forEach(ol => ol.className = 'list-decimal pl-5 space-y-1.5 my-2.5 text-slate-200');
+
+          return tempDiv.innerHTML;
+        }
+
+        // Custom Fallback Markdown Parser
+        function simpleMarkdownFallback(text) {
+          let escaped = escapeChatHtml(text);
+          // Block formats
+          escaped = escaped.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+          // Inline highlight
+          escaped = escaped.replace(/`([^`]+)`/g, '<span class="px-1.5 py-0.5 rounded bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 font-mono text-[11px]">$1</span>');
+          // Headings
+          escaped = escaped.replace(/^### (.*$)/gim, '<h3 class="text-sm font-bold text-cyan-300 mt-2.5 mb-1">$1</h3>');
+          escaped = escaped.replace(/^## (.*$)/gim, '<h2 class="text-base font-extrabold text-white mt-3.5 mb-1.5">$1</h2>');
+          escaped = escaped.replace(/^# (.*$)/gim, '<h1 class="text-lg font-black text-white mt-4 mb-2">$1</h1>');
+          // Bold & Italics
+          escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-white">$1</strong>');
+          escaped = escaped.replace(/\*([^*]+)\*/g, '<em class="italic text-slate-200">$1</em>');
+          // Bullet lists
+          escaped = escaped.replace(/^\* (.*$)/gim, '<li class="ml-4 list-disc">$1</li>');
+          escaped = escaped.replace(/^- (.*$)/gim, '<li class="ml-4 list-disc">$1</li>');
+          // Blockquotes
+          escaped = escaped.replace(/^> (.*$)/gim, '<blockquote class="border-l-4 border-cyan-400 pl-3 py-1 my-1.5 text-slate-300">$1</blockquote>');
+          // Line breaks
+          escaped = escaped.replace(/\n/g, '<br/>');
+          return escaped;
+        }
 
         function escapeChatHtml(str) {
+          if (!str) return '';
           const div = document.createElement('div');
           div.textContent = str;
           return div.innerHTML;
         }
 
-        function appendUserMessage(text) {
-          if (!aiChatMessages) return;
-          const msgDiv = document.createElement('div');
-          msgDiv.className = 'flex items-start justify-end gap-2 max-w-[85%] ml-auto';
-          msgDiv.innerHTML = `
-            <div class="p-3.5 rounded-2xl rounded-tr-sm bg-gradient-to-r from-blue-600 to-indigo-600 text-white leading-relaxed shadow-md font-sans">
-              ${escapeChatHtml(text)}
-            </div>
-          `;
-          aiChatMessages.appendChild(msgDiv);
-          aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
-        }
+        // Render Conversation Sidebar
+        function renderAiSessionsSidebar(searchQuery = '') {
+          if (!aiSessionsList) return;
+          const sessions = getAiSessions();
+          const currentId = getCurrentSessionId();
+          aiSessionsList.innerHTML = '';
 
-        function appendAiMessage(htmlContent) {
-          if (!aiChatMessages) return;
-          const msgDiv = document.createElement('div');
-          msgDiv.className = 'flex items-start gap-2.5 max-w-[88%]';
-          msgDiv.innerHTML = `
-            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-600 via-indigo-600 to-cyan-500 text-white flex items-center justify-center text-xs shrink-0 mt-0.5 shadow-md">
-              <i class="fa-solid fa-shield-halved"></i>
-            </div>
-            <div class="p-4 rounded-2xl rounded-tl-sm bg-cyan-950/40 border border-cyan-800/60 text-slate-100 leading-relaxed shadow-md font-sans space-y-2 text-xs sm:text-sm">
-              ${htmlContent}
-            </div>
-          `;
-          aiChatMessages.appendChild(msgDiv);
-          aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+          const filtered = searchQuery
+            ? sessions.filter(s => s.title.toLowerCase().includes(searchQuery.toLowerCase()) || s.messages.some(m => m.text.toLowerCase().includes(searchQuery.toLowerCase())))
+            : sessions;
 
-          // Wire any copy buttons generated in AI message
-          msgDiv.querySelectorAll('.copy-complaint-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-              const textToCopy = btn.getAttribute('data-copy');
-              if (textToCopy) {
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                  btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied to Clipboard!';
-                  btn.className = 'copy-complaint-btn mt-2 py-2 px-3 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer';
-                  setTimeout(() => {
-                    btn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy Complaint Letter';
-                    btn.className = 'copy-complaint-btn mt-2 py-2 px-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer';
-                  }, 2500);
-                });
-              }
-            });
-          });
-        }
+          if (filtered.length === 0) {
+            aiSessionsList.innerHTML = `
+              <div class="p-4 text-center text-slate-500 text-xs font-mono">
+                No matching conversations found
+              </div>
+            `;
+            return;
+          }
 
-        function processAiQuery(query) {
-          const q = query.toLowerCase();
-          const lang = currentLang || 'en';
-          let reply = '';
+          filtered.forEach(session => {
+            const isActive = session.id === currentId;
+            const item = document.createElement('div');
+            item.className = `group flex items-center justify-between p-2 rounded-xl transition-all cursor-pointer ${
+              isActive
+                ? 'bg-gradient-to-r from-cyan-950/90 to-blue-950/70 border border-cyan-500/50 text-white shadow-[0_0_12px_rgba(0,240,255,0.2)]'
+                : 'bg-slate-950/50 hover:bg-slate-900 border border-transparent hover:border-slate-800 text-slate-300 hover:text-white'
+            }`;
 
-          // 1. DRAFT POLICE COMPLAINT REQUEST
-          if (q.includes('draft') || q.includes('complaint') || q.includes('fir') || q.includes('letter') || q.includes('police station')) {
-            const complaintText = `To:
-The Officer-in-Charge, Cyber Crime Police Station / National Cyber Crime Reporting Portal (1930)
-
-Subject: Formal Complaint regarding Cyber Financial Fraud & Extortion under Section 66D IT Act and Section 318(4) BNS
-
-Respected Sir/Madam,
-I am writing to report a criminal cyber fraud committed against me on ${new Date().toLocaleDateString('en-IN')}:
-- Victim Name: [Your Full Name]
-- Mobile Number: [Your Mobile Number]
-- Bank Name & Account: [Your Bank Name, A/c Number]
-- Transaction Reference (UTR / RRN): [12-Digit Reference Number]
-- Disputed Amount Deducted: ₹25,000/-
-- Fraudster Sender/Handle/UPI: [Fraudster's Phone Number or UPI ID]
-
-Incident Summary:
-I was deceptively lured and coerced under fraudulent pretenses (impersonation/fake investment/unauthorized debit). The transaction was unauthorized and carried out without my consent. I immediately dialled the National Cyber Helpline 1930 within the golden window (Acknowledgement ID: [1930 NCRP Reference]).
-
-Legal Request:
-In accordance with Section 66D of the Information Technology Act (cheating by personation by using computer resource) and Section 318(4) of Bharatiya Nyaya Sanhita, I request that:
-1. An official FIR/cyber incident record be registered immediately.
-2. The beneficiary mule account holding the disputed funds be frozen to facilitate reversal.
-3. Relevant telecom records and IP logs of the accused be requisitioned.
-
-Sincerely,
-[Your Name]
-Contact: [Your Phone Number]`;
-
-            if (lang === 'ta') {
-              reply = `
-                <div class="space-y-2">
-                  <div class="font-extrabold text-cyan-300 text-sm">📝 அதிகாரப்பூர்வ சைபர் காவல் புகார் கடிதம் (தமிழ் & ஆங்கிலம்)</div>
-                  <p class="text-slate-200">கீழே உள்ள சட்டப்பூர்வ புகார் கடிதத்தை நகலெடுத்து <strong>cybercrime.gov.in</strong> தளத்திலோ அல்லது உங்கள் பகுதி சைபர் காவல் நிலையத்திலோ சமர்ப்பிக்கவும்:</p>
-                  <pre class="p-3 rounded-xl bg-[#030712] border border-cyan-500/40 text-[11px] font-mono text-cyan-200 whitespace-pre-wrap leading-relaxed select-all">${escapeChatHtml(complaintText)}</pre>
-                  <button type="button" class="copy-complaint-btn mt-2 py-2 px-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer" data-copy="${escapeChatHtml(complaintText)}">
-                    <i class="fa-solid fa-copy"></i>
-                    <span>புகார் கடிதத்தை நகலெடுக்க (Copy)</span>
-                  </button>
-                  <p class="text-[10px] text-amber-300">💡 குறிப்பு: 1930 எண்ணை உடனே அழைத்து 'Acknowledgement Number' பெற்று இதில் சேர்க்கவும்.</p>
-                </div>
-              `;
-            } else if (lang === 'hi') {
-              reply = `
-                <div class="space-y-2">
-                  <div class="font-extrabold text-cyan-300 text-sm">📝 आधिकारिक साइबर पुलिस शिकायत पत्र (IT Act धारा 66D)</div>
-                  <p class="text-slate-200">इस औपचारिक शिकायत पत्र को कॉपी करके <strong>cybercrime.gov.in</strong> पोर्टल या नजदीकी साइबर क्राइम थाने में प्रस्तुत करें:</p>
-                  <pre class="p-3 rounded-xl bg-[#030712] border border-cyan-500/40 text-[11px] font-mono text-cyan-200 whitespace-pre-wrap leading-relaxed select-all">${escapeChatHtml(complaintText)}</pre>
-                  <button type="button" class="copy-complaint-btn mt-2 py-2 px-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer" data-copy="${escapeChatHtml(complaintText)}">
-                    <i class="fa-solid fa-copy"></i>
-                    <span>शिकायत पत्र कॉपी करें (Copy Complaint)</span>
-                  </button>
-                  <p class="text-[10px] text-amber-300">💡 सुझाव: तुरंत 1930 पर कॉल करें ताकि लाभार्थी बैंक खाते को फ्रीज कराया जा सके।</p>
-                </div>
-              `;
-            } else {
-              reply = `
-                <div class="space-y-2">
-                  <div class="font-extrabold text-cyan-300 text-sm">📝 Official Cyber Crime Police Complaint Draft (Section 66D IT Act)</div>
-                  <p class="text-slate-200">Here is a legally drafted formal complaint formatted for <strong>cybercrime.gov.in</strong> and your local Cyber Police station:</p>
-                  <pre class="p-3 rounded-xl bg-[#030712] border border-cyan-500/40 text-[11px] font-mono text-cyan-200 whitespace-pre-wrap leading-relaxed select-all">${escapeChatHtml(complaintText)}</pre>
-                  <button type="button" class="copy-complaint-btn mt-2 py-2 px-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer" data-copy="${escapeChatHtml(complaintText)}">
-                    <i class="fa-solid fa-copy"></i>
-                    <span>Copy Complaint Letter</span>
-                  </button>
-                  <div class="p-2.5 rounded-xl bg-amber-950/60 border border-amber-500/40 text-[11px] text-amber-200">
-                    ⚡ <strong>Action:</strong> Dial 1930 immediately to receive a National Cyber Crime Reporting Portal (NCRP) Ticket ID before submitting.
+            const dateStr = new Date(session.updatedAt || session.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+            
+            item.innerHTML = `
+              <div class="flex items-center gap-2 min-w-0 flex-1 session-select-btn">
+                <i class="fa-solid fa-message ${isActive ? 'text-cyan-400' : 'text-slate-500'} text-xs shrink-0"></i>
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-semibold truncate ${isActive ? 'text-white' : 'text-slate-200'}">${escapeChatHtml(session.title || 'Conversation')}</div>
+                  <div class="text-[9px] font-mono text-slate-500 flex items-center gap-1.5">
+                    <span>${session.messages ? session.messages.length : 0} msgs</span>
+                    <span>•</span>
+                    <span>${dateStr}</span>
                   </div>
                 </div>
-              `;
-            }
-          }
-
-          // 2. ELECTRICITY BILL DISCONNECTION SCAM
-          else if (q.includes('electricity') || q.includes('power cut') || q.includes('disconnection') || q.includes('tangedco') || q.includes('bescom') || q.includes('msedcl') || q.includes('uppcl')) {
-            if (lang === 'ta') {
-              reply = `
-                <div class="space-y-2">
-                  <div class="font-bold text-amber-400 text-sm">⚡ மின்சாரக் கட்டண மோசடி எச்சரிக்கை:</div>
-                  <p>மின்சார வாரியம் (TANGEDCO) <strong>ஒருபோதும் தனிப்பட்ட 10 இலக்க மொபைல் எண்ணிலிருந்து</strong> "மின்சாரம் இன்றிரவு துண்டிக்கப்படும்" என்று செய்தி அனுப்பாது!</p>
-                  <ul class="space-y-1 list-disc pl-4 text-slate-200">
-                    <li>அந்த எண்ணுக்கு திருப்பி அழைக்காதீர்கள்.</li>
-                    <li>அவர்கள் அனுப்பும் <strong>QuickSupport / AnyDesk</strong> போன்ற எந்த APK-வையும் பதிவிறக்காதீர்கள்; அது உங்கள் வங்கிக் கணக்கைத் திருடும்.</li>
-                    <li>உங்கள் மின் கட்டணத்தை அரசின் அதிகாரப்பூர்வ இணையதளம் அல்லது Bharat BillPay (BBPS) மூலம் மட்டுமே சரிபார்க்கவும்.</li>
-                  </ul>
-                </div>
-              `;
-            } else if (lang === 'hi') {
-              reply = `
-                <div class="space-y-2">
-                  <div class="font-bold text-amber-400 text-sm">⚡ बिजली बिल कटने की फर्जी धमकी:</div>
-                  <p>बिजली विभाग (DISCOM) कभी भी किसी <strong>व्यक्तिगत मोबाइल नंबर</strong> से बिजली काटने की धमकी भरा SMS नहीं भेजता!</p>
-                  <ul class="space-y-1 list-disc pl-4 text-slate-200">
-                    <li>दिए गए नंबर पर कॉल न करें।</li>
-                    <li>वे आपको <strong>QuickSupport / AnyDesk APK</strong> डाउनलोड करने को कहेंगे जिससे मोबाइल का नियंत्रण उनके हाथ चला जाता है।</li>
-                    <li>बिल की जांच केवल आधिकारिक DISCOM पोर्टल या सरकारी BBPS ऐप से करें।</li>
-                  </ul>
-                </div>
-              `;
-            } else {
-              reply = `
-                <div class="space-y-2">
-                  <div class="font-bold text-amber-400 text-sm">⚡ Electricity Bill Disconnection Fraud Alert:</div>
-                  <p>State Electricity Boards (TANGEDCO, BESCOM, MSEDCL, UPPCL, BSES, etc.) <strong>NEVER send disconnection threats from personal 10-digit mobile numbers</strong>!</p>
-                  <ul class="space-y-1 list-disc pl-4 text-slate-200">
-                    <li><strong>Do Not Call:</strong> The number in the SMS belongs to an organized cyber racket.</li>
-                    <li><strong>Never Install Remote Apps:</strong> Scammers will instruct you to install <em>QuickSupport</em>, <em>AnyDesk</em>, or a "Bill Pay APK" to steal your OTPs.</li>
-                    <li><strong>Official Verification:</strong> Always verify your billing status directly on your state DISCOM website or through Bharat BillPay (BBPS).</li>
-                  </ul>
-                </div>
-              `;
-            }
-          }
-
-          // 3. WORK FROM HOME / TELEGRAM JOB SCAM
-          else if (q.includes('telegram') || q.includes('job') || q.includes('work from home') || q.includes('part-time') || q.includes('youtube like') || q.includes('task')) {
-            if (lang === 'ta') {
-              reply = `
-                <div class="space-y-2">
-                  <div class="font-bold text-purple-400 text-sm">💼 டெலிகிராம் பகுதி நேர வேலை மோசடி:</div>
-                  <p>இது நாடு முழுவதும் நடக்கும் பிரபல மோசடி. யூடியூப் வீடியோக்களுக்கு லைக் போட சொல்லி முதலில் ₹200-₹500 கொடுப்பார்கள். பின்னர் 'முதலீடு' செய்ய சொல்லி லட்சங்களை ஏமாற்றுவார்கள்.</p>
-                  <ul class="space-y-1 list-disc pl-4 text-slate-200">
-                    <li>அடுத்த கட்ட பணத்தை ஒருபோதும் செலுத்தாதீர்கள் (வரி அல்லது வித்ட்ரா கட்டணம் என்று பொய் சொல்வார்கள்).</li>
-                    <li>பணம் செலுத்திய UPI / வங்கி பரிவர்த்தனை UTR எண்ணை குறித்துக்கொண்டு உடனே <strong>1930</strong> எண்ணை அழையுங்கள்.</li>
-                  </ul>
-                </div>
-              `;
-            } else if (lang === 'hi') {
-              reply = `
-                <div class="space-y-2">
-                  <div class="font-bold text-purple-400 text-sm">💼 पार्ट-टाइम टेलीग्राम टास्क / वर्क-फ्रॉम-होम स्कैम:</div>
-                  <p>यह एक सुनियोजित गिरोह है। पहले YouTube वीडियो लाइक या होटल रिव्यू के बदले ₹150-₹500 का छोटा मुनाफा देते हैं, फिर लाखों की रकम 'प्रीपेड टास्क' के नाम पर फंसा लेते हैं।</p>
-                  <ul class="space-y-1 list-disc pl-4 text-slate-200">
-                    <li>पैसे निकालने के लिए टैक्स या अनफ्रीज शुल्क के नाम पर और पैसे कभी न भेजें।</li>
-                    <li>तुरंत <strong>1930</strong> पर कॉल करें और साइबर पुलिस में UTR नंबर के साथ शिकायत दर्ज कराएं।</li>
-                  </ul>
-                </div>
-              `;
-            } else {
-              reply = `
-                <div class="space-y-2">
-                  <div class="font-bold text-purple-400 text-sm">💼 Part-Time Telegram Job / Task Fraud:</div>
-                  <p>This is a widespread syndicated scam. Victims are lured into liking YouTube videos or writing Google reviews with small initial payouts (₹200–₹500), then tricked into depositing large sums (₹25,000 to ₹5,00,000+) for "crypto VIP tasks".</p>
-                  <ul class="space-y-1 list-disc pl-4 text-slate-200">
-                    <li><strong>Never Send More Funds:</strong> Scammers claim your money is "frozen" and demand 30% tax to release it. This is a lie—no money will ever be returned.</li>
-                    <li><strong>Golden Hour Recovery:</strong> Report the destination UPI ID and transaction UTR immediately to <strong>1930</strong> and your bank to freeze recipient mule accounts.</li>
-                  </ul>
-                </div>
-              `;
-            }
-          }
-
-          // 4. DIGITAL ARREST / POLICE / CBI / FEDEX EXTORTION
-          else if (q.includes('digital arrest') || q.includes('cbi') || q.includes('police') || q.includes('customs') || q.includes('fedex') || q.includes('skype') || q.includes('arrest') || q.includes('warrant')) {
-            reply = `
-              <div class="space-y-2">
-                <div class="font-bold text-red-400 text-sm">🚨 NO SUCH THING AS "DIGITAL ARREST" in Indian Law!</div>
-                <p>The Ministry of Home Affairs (MHA) and Supreme Court of India have strictly confirmed: <strong>No police, CBI, ED, or Customs officer will ever interrogate you or place you under arrest via Skype or WhatsApp Video Call!</strong></p>
-                <ul class="space-y-1 list-disc pl-4 text-slate-200">
-                  <li><strong>Disconnect Immediately:</strong> Hang up the video call. Do not be intimidated by fake police uniforms or forged letters with national emblems.</li>
-                  <li><strong>Never Transfer to "RBI Verification Accounts":</strong> The RBI has no individual secret accounts for verifying citizen funds.</li>
-                  <li><strong>Call 1930:</strong> Report the video caller's phone number to National Cyber Crime portal immediately.</li>
-                </ul>
+              </div>
+              <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-1 shrink-0">
+                <button type="button" class="ai-delete-session-btn p-1 text-slate-500 hover:text-red-400 rounded hover:bg-slate-800 text-xs cursor-pointer" title="Delete conversation" data-id="${session.id}">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
               </div>
             `;
-          }
 
-          // 5. BANK CHARGEBACK & FREEZE PROCEDURE (RBI RULES)
-          else if (q.includes('chargeback') || q.includes('rbi') || q.includes('refund') || q.includes('reverse') || q.includes('lost money') || q.includes('deducted') || q.includes('freeze')) {
-            reply = `
-              <div class="space-y-2">
-                <div class="font-bold text-emerald-400 text-sm">💳 Bank Chargeback & Fraud Reversal Procedure:</div>
-                <p>Under <strong>RBI Circular DBR.No.Leg.BC.78/09.07.005/2017-18</strong>, citizens have <strong>Zero Liability</strong> for third-party cyber breaches if reported within 3 working days:</p>
-                <ol class="space-y-1.5 list-decimal pl-4 text-slate-200 text-xs">
-                  <li><strong>Freeze Account:</strong> Call your bank's cyber hotline immediately (SBI: 1800 11 2211 | HDFC: 1800 1600 | ICICI: 1800 1080) to stop further transfers.</li>
-                  <li><strong>File 1930 NCRP:</strong> Dial 1930 or file at <em>cybercrime.gov.in</em> to get an official Acknowledgement Number.</li>
-                  <li><strong>Submit Written Dispute Form:</strong> Visit your branch or email the Nodal Officer with the transaction UTR number and police acknowledgement asking for a chargeback reversal.</li>
-                  <li><strong>Escalate to RBI Ombudsman:</strong> If the bank fails to resolve within 30 days, file an appeal at <em>cms.rbi.org.in</em>.</li>
-                </ol>
-              </div>
-            `;
-          }
+            // Click to activate
+            item.querySelector('.session-select-btn')?.addEventListener('click', () => {
+              setCurrentSessionId(session.id);
+              playSciFiSound('click');
+              // On mobile, close sidebar on select
+              if (window.innerWidth < 768 && aiChatSidebar) {
+                aiChatSidebar.classList.add('hidden');
+              }
+            });
 
-          // 6. BANK KYC EXPIRED / APK DROPPER
-          else if (q.includes('kyc') || q.includes('apk') || q.includes('pan card') || q.includes('yono') || q.includes('sbi')) {
-            reply = `
-              <div class="space-y-2">
-                <div class="font-bold text-red-400 text-sm">🏦 Malicious Bank KYC APK Alert:</div>
-                <p>Banks never send SMS messages with links ending in <code>.apk</code> or shortened links (bit.ly, tinyurl) asking you to update PAN card:</p>
-                <ul class="space-y-1 list-disc pl-4 text-slate-200">
-                  <li><strong>If you installed the APK:</strong> Immediately turn on <strong>Airplane Mode</strong> to stop the malware from sending SMS messages in the background.</li>
-                  <li><strong>Uninstall App:</strong> Go to Settings &gt; Apps &gt; remove suspicious apps (often named 'SBI Update' or 'Support').</li>
-                  <li><strong>Reset Net Banking:</strong> Change your login password and UPI PIN from a different, secure phone or computer.</li>
-                </ul>
-              </div>
-            `;
-          }
+            // Delete click
+            item.querySelector('.ai-delete-session-btn')?.addEventListener('click', (e) => {
+              e.stopPropagation();
+              deleteAiSession(session.id);
+            });
 
-          // DEFAULT EMAPTHETIC CYBER DEFENSE COUNSELOR
-          else {
-            reply = `
-              <div class="space-y-2">
-                <div class="font-bold text-cyan-300 text-sm">🛡️ Scam Shield AI Counselor Guidance:</div>
-                <p>I am actively monitoring the National Cyber Threat Grid (1930). I can assist you with:</p>
-                <ul class="space-y-1 list-disc pl-4 text-slate-200">
-                  <li>Checking if a suspicious SMS or WhatsApp forward is a known scam</li>
-                  <li>Step-by-step procedures to freeze your debit card or UPI account</li>
-                  <li>Drafting an official police complaint under Section 66D IT Act</li>
-                  <li>Handling fake electricity cut notices or digital arrest threats</li>
-                </ul>
-                <p class="text-[11px] text-cyan-200">Tap any of the prompt chips above or describe what happened in English, தமிழ், or हिंदी!</p>
-              </div>
-            `;
-          }
-
-          if (aiTypingIndicator) aiTypingIndicator.classList.remove('hidden');
-          if (aiChatMessages) aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
-
-          setTimeout(() => {
-            if (aiTypingIndicator) aiTypingIndicator.classList.add('hidden');
-            appendAiMessage(reply);
-            playSciFiSound('pulse');
-          }, 800);
-        }
-
-        if (aiChatForm && aiChatInput) {
-          aiChatForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const val = aiChatInput.value.trim();
-            if (!val) return;
-            appendUserMessage(val);
-            aiChatInput.value = '';
-            playSciFiSound('click');
-            processAiQuery(val);
+            aiSessionsList.appendChild(item);
           });
         }
 
-        document.querySelectorAll('.ai-quick-chip').forEach(chip => {
-          chip.addEventListener('click', () => {
-            const text = chip.textContent.trim().replace(/^[^a-zA-Z0-9]+/, '');
-            appendUserMessage(text);
+        function createNewAiSession() {
+          const sessions = getAiSessions();
+          const newSession = {
+            id: 'sess_' + Date.now(),
+            title: 'New Chat',
+            mode: activeAiMode,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            messages: []
+          };
+          sessions.unshift(newSession);
+          saveAiSessions(sessions);
+          setCurrentSessionId(newSession.id);
+          playSciFiSound('pulse');
+          if (aiChatInput) aiChatInput.focus();
+        }
+
+        function deleteAiSession(id) {
+          let sessions = getAiSessions();
+          if (sessions.length <= 1) {
+            // If deleting the only session, just reset its messages
+            sessions[0].messages = [];
+            sessions[0].title = 'New Chat';
+            sessions[0].updatedAt = Date.now();
+            saveAiSessions(sessions);
+            renderAiSessionView();
+            renderAiSessionsSidebar();
+            return;
+          }
+          sessions = sessions.filter(s => s.id !== id);
+          saveAiSessions(sessions);
+          if (getCurrentSessionId() === id) {
+            setCurrentSessionId(sessions[0].id);
+          } else {
+            renderAiSessionsSidebar();
+          }
+          playSciFiSound('click');
+        }
+
+        // Render Current Session Messages & Welcome Screen
+        function renderAiSessionView() {
+          const session = getCurrentSession();
+          if (!session || !aiChatMessages) return;
+
+          if (aiCurrentSessionTitle) {
+            aiCurrentSessionTitle.textContent = session.title || 'Cyber Shield AI';
+          }
+
+          aiChatMessages.innerHTML = '';
+
+          // If no messages in this session yet, show the rich ChatGPT/Gemini hero banner & starters
+          if (!session.messages || session.messages.length === 0) {
+            const welcomeCard = document.createElement('div');
+            welcomeCard.className = 'flex flex-col items-center justify-center p-6 text-center space-y-4 my-auto';
+            welcomeCard.innerHTML = `
+              <div class="relative">
+                <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-indigo-600 flex items-center justify-center text-3xl text-white shadow-[0_0_35px_rgba(0,240,255,0.4)] border border-cyan-300/40">
+                  <i class="fa-solid fa-sparkles text-cyan-100"></i>
+                </div>
+                <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 ring-4 ring-[#030714] flex items-center justify-center text-[10px] text-white">
+                  <i class="fa-solid fa-check"></i>
+                </span>
+              </div>
+              <div class="space-y-1.5 max-w-lg">
+                <h2 class="text-xl sm:text-2xl font-black text-white">What would you like to ask today?</h2>
+                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
+                  Conversational companion powered by <strong>Google Gemini</strong>. Get <strong>immediate cyber defense guidance</strong>, spot scam messages, or ask everyday questions in plain, friendly language.
+                </p>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full max-w-xl text-left mt-3">
+                <div class="p-3.5 rounded-2xl bg-[#061126] border border-cyan-500/25 hover:border-cyan-400 hover:bg-[#081734] transition-all cursor-pointer starter-card shadow-sm" data-prompt="Analyze this SMS for fraud: Electricity will be cut tonight at 9:30 PM by order of officer. What should I do?">
+                  <div class="flex items-center gap-2 text-cyan-300 font-bold text-xs mb-1">
+                    <span>⚡</span>
+                    <span>Scam SMS Breakdown</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 line-clamp-2">"Electricity disconnection tonight..."</p>
+                </div>
+                <div class="p-3.5 rounded-2xl bg-[#061126] border border-cyan-500/25 hover:border-cyan-400 hover:bg-[#081734] transition-all cursor-pointer starter-card shadow-sm" data-prompt="Draft a formal police complaint under Section 66D IT Act for ₹35,000 lost to a fake Telegram task fraud.">
+                  <div class="flex items-center gap-2 text-emerald-300 font-bold text-xs mb-1">
+                    <span>📝</span>
+                    <span>Draft Cyber Crime FIR</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 line-clamp-2">"Draft police complaint for ₹35,000 fraud..."</p>
+                </div>
+                <div class="p-3.5 rounded-2xl bg-[#061126] border border-cyan-500/25 hover:border-cyan-400 hover:bg-[#081734] transition-all cursor-pointer starter-card shadow-sm" data-prompt="Someone on a WhatsApp video call in police uniform claims my Aadhaar was found with contraband and placed me on Digital Arrest. How do I escape this?">
+                  <div class="flex items-center gap-2 text-rose-300 font-bold text-xs mb-1">
+                    <span>🛑</span>
+                    <span>Digital Arrest Extortion</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 line-clamp-2">"Police video call demanding money..."</p>
+                </div>
+                <div class="p-3.5 rounded-2xl bg-[#061126] border border-cyan-500/25 hover:border-cyan-400 hover:bg-[#081734] transition-all cursor-pointer starter-card shadow-sm" data-prompt="Explain why legitimate bank officers never ask for OTP or UPI PIN, and give me 5 simple safety habits to protect my family.">
+                  <div class="flex items-center gap-2 text-amber-300 font-bold text-xs mb-1">
+                    <span>🔒</span>
+                    <span>Family Safety Rules</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 line-clamp-2">"5 golden rules to prevent cyber fraud..."</p>
+                </div>
+              </div>
+            `;
+
+            welcomeCard.querySelectorAll('.starter-card').forEach(card => {
+              card.addEventListener('click', () => {
+                const prompt = card.getAttribute('data-prompt');
+                if (prompt) handleSendAiMessage(prompt);
+              });
+            });
+
+            aiChatMessages.appendChild(welcomeCard);
+            return;
+          }
+
+          // Render all messages
+          session.messages.forEach(msg => {
+            if (msg.role === 'user') {
+              renderUserMessageBubble(msg);
+            } else {
+              renderAssistantMessageBubble(msg);
+            }
+          });
+
+          aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+          wireInteractiveMessageButtons();
+        }
+
+        // Render User Message Bubble
+        function renderUserMessageBubble(msg) {
+          const div = document.createElement('div');
+          div.className = 'group flex items-start justify-end gap-3 max-w-[85%] ml-auto';
+          div.id = 'msg-bubble-' + msg.id;
+          div.innerHTML = `
+            <div class="flex flex-col items-end gap-1.5 min-w-0">
+              <div class="p-4 rounded-3xl rounded-tr-sm bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white leading-relaxed shadow-lg font-sans text-xs sm:text-sm whitespace-pre-wrap select-text break-words">
+                ${escapeChatHtml(msg.text)}
+              </div>
+              <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono text-slate-400 pr-1">
+                <button type="button" class="ai-copy-user-btn hover:text-cyan-300 flex items-center gap-1 cursor-pointer" data-id="${msg.id}">
+                  <i class="fa-solid fa-copy"></i>
+                  <span>Copy</span>
+                </button>
+                <span>•</span>
+                <button type="button" class="ai-edit-user-btn hover:text-cyan-300 flex items-center gap-1 cursor-pointer" data-id="${msg.id}">
+                  <i class="fa-solid fa-pencil"></i>
+                  <span>Edit</span>
+                </button>
+              </div>
+            </div>
+            <div class="w-8 h-8 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center text-xs shrink-0 mt-0.5 shadow">
+              <i class="fa-solid fa-user"></i>
+            </div>
+          `;
+          aiChatMessages.appendChild(div);
+        }
+
+        // Render Assistant Message Bubble
+        function renderAssistantMessageBubble(msg) {
+          const div = document.createElement('div');
+          div.className = 'flex items-start gap-3 w-full';
+          div.id = 'msg-bubble-' + msg.id;
+
+          const formattedHtml = renderMarkdownToHtml(msg.text);
+          const timeStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+          div.innerHTML = `
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-600 text-white flex items-center justify-center text-xs shrink-0 mt-0.5 shadow-md border border-cyan-300/40">
+              <i class="fa-solid fa-sparkles text-cyan-100"></i>
+            </div>
+            <div class="flex-1 min-w-0 space-y-2">
+              <div class="p-4 sm:p-5 rounded-2xl rounded-tl-sm bg-[#061125]/95 border border-cyan-500/30 text-slate-100 leading-relaxed shadow-xl font-sans space-y-2 text-xs sm:text-sm">
+                <div class="flex items-center justify-between pb-1.5 border-b border-cyan-500/15">
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-white text-xs text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">Cyber Shield AI</span>
+                    <span class="px-2 py-0.5 rounded text-[8px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-500/40">GOOGLE GEMINI</span>
+                  </div>
+                  <span class="text-[9px] font-mono text-slate-400">${timeStr}</span>
+                </div>
+                <div class="ai-rendered-content text-slate-200 leading-relaxed font-sans">
+                  ${formattedHtml}
+                </div>
+              </div>
+              
+              <!-- Bottom Action Bar (Like ChatGPT & Gemini) -->
+              <div class="flex items-center gap-3 px-1 text-[11px] font-mono text-slate-400">
+                <button type="button" class="ai-copy-response-btn hover:text-cyan-300 flex items-center gap-1.5 transition-colors cursor-pointer" data-id="${msg.id}">
+                  <i class="fa-solid fa-copy"></i>
+                  <span>Copy</span>
+                </button>
+                <button type="button" class="ai-regen-response-btn hover:text-cyan-300 flex items-center gap-1.5 transition-colors cursor-pointer" data-id="${msg.id}">
+                  <i class="fa-solid fa-arrows-rotate"></i>
+                  <span>Regenerate</span>
+                </button>
+                <button type="button" class="ai-listen-response-btn hover:text-cyan-300 flex items-center gap-1.5 transition-colors cursor-pointer" data-id="${msg.id}">
+                  <i class="fa-solid fa-volume-high"></i>
+                  <span>Listen</span>
+                </button>
+                <div class="flex items-center gap-1 ml-auto">
+                  <button type="button" class="ai-feedback-btn p-1 hover:text-emerald-400 rounded cursor-pointer" title="Helpful" data-vote="up">
+                    <i class="fa-regular fa-thumbs-up"></i>
+                  </button>
+                  <button type="button" class="ai-feedback-btn p-1 hover:text-red-400 rounded cursor-pointer" title="Not helpful" data-vote="down">
+                    <i class="fa-regular fa-thumbs-down"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          aiChatMessages.appendChild(div);
+        }
+
+        // Live Typewriter / Streaming Renderer to perform like real-life Gemini
+        function streamAssistantMessageBubble(msg, onComplete) {
+          const div = document.createElement('div');
+          div.className = 'flex items-start gap-3 w-full';
+          div.id = 'msg-bubble-' + msg.id;
+
+          const timeStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+          div.innerHTML = `
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-600 text-white flex items-center justify-center text-xs shrink-0 mt-0.5 shadow-md border border-cyan-300/40">
+              <i class="fa-solid fa-sparkles text-cyan-100"></i>
+            </div>
+            <div class="flex-1 min-w-0 space-y-2">
+              <div class="p-4 sm:p-5 rounded-2xl rounded-tl-sm bg-[#061125]/95 border border-cyan-500/30 text-slate-100 leading-relaxed shadow-xl font-sans space-y-2 text-xs sm:text-sm">
+                <div class="flex items-center justify-between pb-1.5 border-b border-cyan-500/15">
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-white text-xs text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">Cyber Shield AI</span>
+                    <span class="px-2 py-0.5 rounded text-[8px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-500/40">GOOGLE GEMINI</span>
+                  </div>
+                  <span class="text-[9px] font-mono text-slate-400">${timeStr}</span>
+                </div>
+                <div class="ai-rendered-content text-slate-200 leading-relaxed font-sans">
+                  <span class="stream-text"></span><span class="stream-cursor inline-block w-2 h-3.5 bg-cyan-400 ml-0.5 animate-pulse"></span>
+                </div>
+              </div>
+              
+              <!-- Bottom Action Bar (Like ChatGPT & Gemini) -->
+              <div class="ai-msg-actions hidden flex items-center gap-3 px-1 text-[11px] font-mono text-slate-400">
+                <button type="button" class="ai-copy-response-btn hover:text-cyan-300 flex items-center gap-1.5 transition-colors cursor-pointer" data-id="${msg.id}">
+                  <i class="fa-solid fa-copy"></i>
+                  <span>Copy</span>
+                </button>
+                <button type="button" class="ai-regen-response-btn hover:text-cyan-300 flex items-center gap-1.5 transition-colors cursor-pointer" data-id="${msg.id}">
+                  <i class="fa-solid fa-arrows-rotate"></i>
+                  <span>Regenerate</span>
+                </button>
+                <button type="button" class="ai-listen-response-btn hover:text-cyan-300 flex items-center gap-1.5 transition-colors cursor-pointer" data-id="${msg.id}">
+                  <i class="fa-solid fa-volume-high"></i>
+                  <span>Listen</span>
+                </button>
+                <div class="flex items-center gap-1 ml-auto">
+                  <button type="button" class="ai-feedback-btn p-1 hover:text-emerald-400 rounded cursor-pointer" title="Helpful" data-vote="up">
+                    <i class="fa-regular fa-thumbs-up"></i>
+                  </button>
+                  <button type="button" class="ai-feedback-btn p-1 hover:text-red-400 rounded cursor-pointer" title="Not helpful" data-vote="down">
+                    <i class="fa-regular fa-thumbs-down"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          aiChatMessages.appendChild(div);
+
+          const streamTextEl = div.querySelector('.stream-text');
+          const cursorEl = div.querySelector('.stream-cursor');
+          const actionsEl = div.querySelector('.ai-msg-actions');
+
+          const fullText = msg.text || '';
+          const words = fullText.split(' ');
+          let wordIdx = 0;
+          let currentWords = [];
+          let hasFinished = false;
+
+          const finishStream = () => {
+            if (hasFinished) return;
+            hasFinished = true;
+            clearInterval(interval);
+            if (cursorEl) cursorEl.remove();
+            if (streamTextEl) streamTextEl.innerHTML = renderMarkdownToHtml(fullText);
+            if (actionsEl) actionsEl.classList.remove('hidden');
+            if (onComplete) onComplete();
+          };
+
+          const interval = setInterval(() => {
+            const nextBatch = words.slice(wordIdx, wordIdx + 2);
+            wordIdx += 2;
+            currentWords.push(...nextBatch);
+
+            if (streamTextEl) {
+              streamTextEl.innerHTML = renderMarkdownToHtml(currentWords.join(' '));
+            }
+            aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+
+            if (wordIdx >= words.length) {
+              finishStream();
+            }
+          }, 18);
+
+          // Tap bubble to immediately complete streaming
+          div.addEventListener('click', finishStream, { once: true });
+        }
+
+        // Wire Event Listeners on Message Bubbles (Copy, Regenerate, Listen, Edit)
+        function wireInteractiveMessageButtons() {
+          // Copy Response Buttons
+          document.querySelectorAll('.ai-copy-response-btn').forEach(btn => {
+            btn.onclick = () => {
+              const msgId = btn.getAttribute('data-id');
+              const session = getCurrentSession();
+              const msg = session?.messages.find(m => m.id === msgId);
+              if (msg && msg.text) {
+                navigator.clipboard.writeText(msg.text).then(() => {
+                  btn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> <span class="text-emerald-300">Copied!</span>';
+                  setTimeout(() => {
+                    btn.innerHTML = '<i class="fa-solid fa-copy"></i> <span>Copy</span>';
+                  }, 2000);
+                });
+              }
+            };
+          });
+
+          // Copy User Message Buttons
+          document.querySelectorAll('.ai-copy-user-btn').forEach(btn => {
+            btn.onclick = () => {
+              const msgId = btn.getAttribute('data-id');
+              const session = getCurrentSession();
+              const msg = session?.messages.find(m => m.id === msgId);
+              if (msg && msg.text) {
+                navigator.clipboard.writeText(msg.text).then(() => {
+                  btn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> Copied';
+                  setTimeout(() => {
+                    btn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy';
+                  }, 2000);
+                });
+              }
+            };
+          });
+
+          // Edit User Message
+          document.querySelectorAll('.ai-edit-user-btn').forEach(btn => {
+            btn.onclick = () => {
+              const msgId = btn.getAttribute('data-id');
+              const session = getCurrentSession();
+              const msg = session?.messages.find(m => m.id === msgId);
+              if (msg && aiChatInput) {
+                aiChatInput.value = msg.text;
+                aiChatInput.focus();
+                aiChatInput.style.height = 'auto';
+                aiChatInput.style.height = Math.min(aiChatInput.scrollHeight, 140) + 'px';
+                playSciFiSound('click');
+              }
+            };
+          });
+
+          // Copy Formal Draft / Template Blocks
+          document.querySelectorAll('.ai-copy-doc-btn, .ai-copy-code-btn').forEach(btn => {
+            btn.onclick = () => {
+              const encoded = btn.getAttribute('data-text') || btn.getAttribute('data-code');
+              if (encoded) {
+                const text = decodeURIComponent(encoded);
+                navigator.clipboard.writeText(text).then(() => {
+                  btn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> <span class="text-emerald-300">Copied!</span>';
+                  setTimeout(() => {
+                    btn.innerHTML = '<i class="fa-solid fa-copy"></i> <span>Copy Draft</span>';
+                  }, 2000);
+                });
+              }
+            };
+          });
+
+          // Regenerate Response
+          document.querySelectorAll('.ai-regen-response-btn').forEach(btn => {
+            btn.onclick = () => {
+              const session = getCurrentSession();
+              if (!session || !session.messages || session.messages.length === 0) return;
+              // Find the last user prompt
+              const lastUserMsg = [...session.messages].reverse().find(m => m.role === 'user');
+              if (lastUserMsg) {
+                handleSendAiMessage(lastUserMsg.text, true);
+              }
+            };
+          });
+
+          // Text-to-Speech (Listen)
+          document.querySelectorAll('.ai-listen-response-btn').forEach(btn => {
+            btn.onclick = () => {
+              const msgId = btn.getAttribute('data-id');
+              const session = getCurrentSession();
+              const msg = session?.messages.find(m => m.id === msgId);
+              if (msg && msg.text) {
+                speakAiResponse(msg.text, btn);
+              }
+            };
+          });
+
+          // Feedback Buttons
+          document.querySelectorAll('.ai-feedback-btn').forEach(btn => {
+            btn.onclick = () => {
+              const vote = btn.getAttribute('data-vote');
+              btn.innerHTML = vote === 'up' ? '<i class="fa-solid fa-thumbs-up text-emerald-400"></i>' : '<i class="fa-solid fa-thumbs-down text-red-400"></i>';
+              playSciFiSound('click');
+            };
+          });
+        }
+
+        // Voice Read Aloud (TTS)
+        let activeUtterance = null;
+        function speakAiResponse(rawText, btnEl = null) {
+          if (!('speechSynthesis' in window)) {
+            alert('Speech synthesis is not supported in this browser.');
+            return;
+          }
+
+          if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+            if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>Listen</span>';
+            return;
+          }
+
+          // Clean markdown formatting for clear spoken voice
+          const cleanText = rawText
+            .replace(/```[\s\S]*?```/g, 'Code snippet omitted.')
+            .replace(/`([^`]+)`/g, '$1')
+            .replace(/[*#_~]/g, '')
+            .replace(/\n+/g, '. ')
+            .trim();
+
+          const utterance = new SpeechSynthesisUtterance(cleanText);
+          const lang = currentLang || 'en';
+          if (lang === 'ta') utterance.lang = 'ta-IN';
+          else if (lang === 'hi') utterance.lang = 'hi-IN';
+          else utterance.lang = 'en-US';
+
+          utterance.rate = 1.0;
+          utterance.pitch = 1.0;
+
+          if (btnEl) {
+            btnEl.innerHTML = '<i class="fa-solid fa-stop text-red-400"></i> <span class="text-red-300">Stop</span>';
+          }
+
+          utterance.onend = () => {
+            if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>Listen</span>';
+          };
+          utterance.onerror = () => {
+            if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>Listen</span>';
+          };
+
+          window.speechSynthesis.speak(utterance);
+        }
+
+        // Core Send Message Routine to Google GenAI Backend
+        async function handleSendAiMessage(promptText, isRegenerate = false) {
+          if (!promptText || !promptText.trim()) return;
+          const query = promptText.trim();
+
+          const session = getCurrentSession();
+          if (!session) return;
+
+          // If not regenerating, add user message to conversation history
+          if (!isRegenerate) {
+            const userMsg = {
+              id: 'msg_u_' + Date.now(),
+              role: 'user',
+              text: query,
+              timestamp: Date.now()
+            };
+            updateCurrentSession(s => {
+              s.messages.push(userMsg);
+            });
+            renderUserMessageBubble(userMsg);
+          }
+
+          // Clear input and reset height
+          if (aiChatInput) {
+            aiChatInput.value = '';
+            aiChatInput.style.height = '44px';
+          }
+
+          // Play interaction sound
+          playSciFiSound('click');
+
+          // Scroll to bottom
+          if (aiChatMessages) aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+
+          // Show typing indicator
+          isAiGenerating = true;
+          if (aiTypingIndicator) aiTypingIndicator.classList.remove('hidden');
+          if (aiTypingText) aiTypingText.textContent = activeAiMode === 'cyber' ? 'Cyber Shield AI investigating threat...' : 'Gemini Neural Engine generating answer...';
+
+          // Transform send button into stop button
+          if (aiChatSendBtn && aiSendIcon) {
+            aiSendIcon.className = 'fa-solid fa-stop text-xs';
+            aiChatSendBtn.title = 'Stop Generating';
+          }
+
+          // Prepare prior turn history for multi-turn context
+          const historyForApi = session.messages
+            .filter(m => m.text && !m.isError)
+            .map(m => ({
+              role: m.role === 'user' ? 'user' : 'model',
+              text: m.text
+            }));
+
+          // Setup AbortController for cancelable generation
+          aiAbortController = new AbortController();
+
+          try {
+            const resp = await fetch('/api/gemini/chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                message: query,
+                history: historyForApi.slice(-12),
+                lang: currentLang || 'en',
+                mode: activeAiMode
+              }),
+              signal: aiAbortController.signal
+            });
+
+            if (!resp.ok) {
+              throw new Error(`Server returned HTTP ${resp.status}`);
+            }
+
+            const data = await resp.json();
+            const replyText = data.reply || 'I processed your query. Please take necessary cyber precautions.';
+
+            // Create Assistant Message Object
+            const assistantMsg = {
+              id: 'msg_a_' + Date.now(),
+              role: 'assistant',
+              text: replyText,
+              timestamp: Date.now()
+            };
+
+            updateCurrentSession(s => {
+              s.messages.push(assistantMsg);
+            });
+
+            // Hide typing indicator
+            if (aiTypingIndicator) aiTypingIndicator.classList.add('hidden');
+
+            // Render message with streaming typewriter effect (like real-life Gemini)
+            streamAssistantMessageBubble(assistantMsg, () => {
+              wireInteractiveMessageButtons();
+              playSciFiSound('pulse');
+
+              // If this is the first turn of a new session, auto-generate a smart title
+              if (session.messages.length <= 2 && (session.title === 'New Chat' || session.title.includes('Welcome'))) {
+                generateAiSessionTitle(query, session.id);
+              }
+
+              // Auto Read Aloud if TTS is globally toggled on
+              if (isAiTtsActive) {
+                speakAiResponse(replyText);
+              }
+            });
+
+          } catch (err) {
+            if (err.name === 'AbortError') {
+              console.log('Generation stopped by user');
+            } else {
+              console.error('Chat generation error:', err);
+              const errMsg = {
+                id: 'msg_err_' + Date.now(),
+                role: 'assistant',
+                text: `⚠️ **Unable to complete response.**\n\n${err.message || 'Network connectivity error'}. Please check your connection and tap **Regenerate** to retry.`,
+                timestamp: Date.now(),
+                isError: true
+              };
+              updateCurrentSession(s => s.messages.push(errMsg));
+              renderAssistantMessageBubble(errMsg);
+              wireInteractiveMessageButtons();
+            }
+          } finally {
+            isAiGenerating = false;
+            aiAbortController = null;
+            if (aiTypingIndicator) aiTypingIndicator.classList.add('hidden');
+            if (aiChatSendBtn && aiSendIcon) {
+              aiSendIcon.className = 'fa-solid fa-paper-plane text-xs';
+              aiChatSendBtn.title = 'Send Message';
+            }
+            if (aiChatMessages) aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+          }
+        }
+
+        // Auto Title Generator using backend endpoint
+        async function generateAiSessionTitle(promptText, sessionId) {
+          try {
+            const resp = await fetch('/api/gemini/title', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ message: promptText })
+            });
+            if (resp.ok) {
+              const data = await resp.json();
+              if (data.title) {
+                const sessions = getAiSessions();
+                const target = sessions.find(s => s.id === sessionId);
+                if (target) {
+                  target.title = data.title;
+                  saveAiSessions(sessions);
+                  if (getCurrentSessionId() === sessionId && aiCurrentSessionTitle) {
+                    aiCurrentSessionTitle.textContent = data.title;
+                  }
+                  renderAiSessionsSidebar();
+                }
+              }
+            }
+          } catch (e) {}
+        }
+
+        // Prompt Starter Chips Renderer
+        function renderAiPromptChips(category = 'scams') {
+          if (!aiChipsContainer) return;
+          aiChipsContainer.innerHTML = '';
+          const chips = AI_PROMPT_CATEGORIES[category] || AI_PROMPT_CATEGORIES.scams;
+
+          chips.forEach(item => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'ai-quick-chip px-3 py-1.5 rounded-full bg-slate-900/90 hover:bg-cyan-950 border border-cyan-500/30 text-cyan-200 text-[10px] font-mono whitespace-nowrap cursor-pointer transition-all active:scale-95 flex items-center gap-1.5 shrink-0 shadow-sm';
+            btn.innerHTML = `<span>${item.icon}</span><span class="truncate max-w-[240px]">${item.label}</span>`;
+            btn.onclick = () => {
+              handleSendAiMessage(item.prompt);
+            };
+            aiChipsContainer.appendChild(btn);
+          });
+        }
+
+        // Voice Dictation (Speech-to-Text) Engine
+        function initAiVoiceRecognition() {
+          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+          if (!SpeechRecognition) {
+            if (aiVoiceInputBtn) aiVoiceInputBtn.title = 'Speech-to-Text not supported in this browser';
+            return;
+          }
+
+          aiSpeechRecognition = new SpeechRecognition();
+          aiSpeechRecognition.continuous = false;
+          aiSpeechRecognition.interimResults = true;
+
+          aiSpeechRecognition.onstart = () => {
+            isAiVoiceRecording = true;
+            if (aiVoiceInputBtn) {
+              aiVoiceInputBtn.classList.add('text-red-400', 'animate-pulse');
+              aiVoiceInputBtn.classList.remove('text-slate-400');
+            }
+            if (aiVoiceIcon) aiVoiceIcon.className = 'fa-solid fa-microphone-lines text-xs text-red-400';
+            playSciFiSound('scan');
+          };
+
+          aiSpeechRecognition.onresult = (event) => {
+            let transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+              transcript += event.results[i][0].transcript;
+            }
+            if (aiChatInput && transcript) {
+              aiChatInput.value = transcript;
+              aiChatInput.style.height = 'auto';
+              aiChatInput.style.height = Math.min(aiChatInput.scrollHeight, 140) + 'px';
+            }
+          };
+
+          aiSpeechRecognition.onerror = (event) => {
+            console.warn('Speech recognition error:', event.error);
+            stopAiVoiceRecognition();
+          };
+
+          aiSpeechRecognition.onend = () => {
+            stopAiVoiceRecognition();
+          };
+        }
+
+        function stopAiVoiceRecognition() {
+          isAiVoiceRecording = false;
+          if (aiVoiceInputBtn) {
+            aiVoiceInputBtn.classList.remove('text-red-400', 'animate-pulse');
+            aiVoiceInputBtn.classList.add('text-slate-400');
+          }
+          if (aiVoiceIcon) aiVoiceIcon.className = 'fa-solid fa-microphone text-xs';
+        }
+
+        // ========================================================
+        // VOICE-INTERACTIVE CYBER DEFENSE TRIAGE ENGINE (WEB SPEECH API)
+        // ========================================================
+        function startVoiceTriageRecording() {
+          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+          if (!SpeechRecognition) {
+            alert('Web Speech API is not supported in this browser. Please type your cyber concern in the chat box.');
+            return;
+          }
+
+          if (isAiGenerating) {
+            alert('AI Assistant is currently generating a response. Please wait or stop generation first.');
+            return;
+          }
+
+          try {
+            voiceTriageRecognition = new SpeechRecognition();
+            voiceTriageRecognition.continuous = false; // Auto-terminates on pause/silence to trigger triage
+            voiceTriageRecognition.interimResults = true;
+
+            const lang = currentLang || 'en';
+            if (lang === 'ta') voiceTriageRecognition.lang = 'ta-IN';
+            else if (lang === 'hi') voiceTriageRecognition.lang = 'hi-IN';
+            else voiceTriageRecognition.lang = 'en-IN';
+
+            voiceTriageTranscript = '';
+
+            voiceTriageRecognition.onstart = () => {
+              isVoiceTriageRecording = true;
+              if (aiVoiceTriageBtn) {
+                aiVoiceTriageBtn.classList.add('ring-2', 'ring-red-400', 'from-red-700', 'to-rose-800', 'shadow-[0_0_35px_rgba(239,68,68,0.7)]');
+              }
+              if (aiVoiceTriageLabel) aiVoiceTriageLabel.textContent = 'Stop & Send';
+              if (aiVoiceTriageIcon) aiVoiceTriageIcon.className = 'fa-solid fa-microphone-lines text-xs text-red-200 animate-pulse';
+              if (aiVoiceTriagePing) aiVoiceTriagePing.classList.remove('hidden');
+              if (aiVoiceTriageDot) aiVoiceTriageDot.className = 'inline-flex rounded-full h-2 w-2 bg-red-400';
+              if (aiVoiceTriageStatus) aiVoiceTriageStatus.classList.remove('hidden');
+              if (aiVoiceTriagePreview) aiVoiceTriagePreview.textContent = 'Listening to your concern... Speak clearly';
+              playSciFiSound('scan');
+            };
+
+            voiceTriageRecognition.onresult = (event) => {
+              let interim = '';
+              let final = '';
+              for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                  final += event.results[i][0].transcript;
+                } else {
+                  interim += event.results[i][0].transcript;
+                }
+              }
+              const current = (final || interim).trim();
+              if (current) {
+                voiceTriageTranscript = current;
+                if (aiChatInput) {
+                  aiChatInput.value = current;
+                  aiChatInput.style.height = 'auto';
+                  aiChatInput.style.height = Math.min(aiChatInput.scrollHeight, 140) + 'px';
+                }
+                if (aiVoiceTriagePreview) {
+                  aiVoiceTriagePreview.textContent = `"${current}"`;
+                }
+              }
+            };
+
+            voiceTriageRecognition.onerror = (event) => {
+              console.warn('Voice Triage speech error:', event.error);
+              if (event.error !== 'no-speech') {
+                stopVoiceTriageRecording(false);
+              }
+            };
+
+            voiceTriageRecognition.onend = () => {
+              if (isVoiceTriageRecording) {
+                const finalPrompt = voiceTriageTranscript.trim();
+                stopVoiceTriageRecording(false);
+                if (finalPrompt) {
+                  playSciFiSound('pulse');
+                  handleSendAiMessage(finalPrompt);
+                }
+              }
+            };
+
+            voiceTriageRecognition.start();
+          } catch (err) {
+            console.error('Failed to start Voice Triage:', err);
+            stopVoiceTriageRecording(false);
+          }
+        }
+
+        function stopVoiceTriageRecording(shouldSend = true) {
+          const finalPrompt = voiceTriageTranscript.trim();
+          isVoiceTriageRecording = false;
+
+          if (voiceTriageRecognition) {
+            try {
+              voiceTriageRecognition.stop();
+            } catch (e) {}
+            voiceTriageRecognition = null;
+          }
+
+          if (aiVoiceTriageBtn) {
+            aiVoiceTriageBtn.classList.remove('ring-2', 'ring-red-400', 'from-red-700', 'to-rose-800', 'shadow-[0_0_35px_rgba(239,68,68,0.7)]');
+          }
+          if (aiVoiceTriageLabel) aiVoiceTriageLabel.textContent = 'Voice Triage';
+          if (aiVoiceTriageIcon) aiVoiceTriageIcon.className = 'fa-solid fa-shield-halved text-xs text-amber-200';
+          if (aiVoiceTriagePing) aiVoiceTriagePing.classList.add('hidden');
+          if (aiVoiceTriageDot) aiVoiceTriageDot.className = 'inline-flex rounded-full h-2 w-2 bg-white';
+          if (aiVoiceTriageStatus) aiVoiceTriageStatus.classList.add('hidden');
+
+          if (shouldSend && finalPrompt) {
+            playSciFiSound('pulse');
+            handleSendAiMessage(finalPrompt);
+          }
+        }
+
+        // Mode Switching Helper (Cyber Defense vs Gemini General AI)
+        function setAiMode(mode) {
+          activeAiMode = mode;
+          if (mode === 'cyber') {
+            if (aiModeCyberBtn) aiModeCyberBtn.className = 'ai-mode-btn active p-2 rounded-xl bg-cyan-950 text-cyan-300 border border-cyan-500/50 font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-sm';
+            if (aiModeGeneralBtn) aiModeGeneralBtn.className = 'ai-mode-btn p-2 rounded-xl bg-slate-900/80 text-slate-400 border border-slate-800 hover:text-white flex items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-800 transition-all';
+            if (aiInputModeLabel) aiInputModeLabel.textContent = '🛡️ Cyber Defense';
+            // Show Voice Triage button in Cyber Defense mode
+            if (aiVoiceTriageBtn) {
+              aiVoiceTriageBtn.classList.remove('hidden');
+              aiVoiceTriageBtn.classList.add('flex');
+            }
+          } else {
+            if (aiModeGeneralBtn) aiModeGeneralBtn.className = 'ai-mode-btn active p-2 rounded-xl bg-cyan-950 text-cyan-300 border border-cyan-500/50 font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-sm';
+            if (aiModeCyberBtn) aiModeCyberBtn.className = 'ai-mode-btn p-2 rounded-xl bg-slate-900/80 text-slate-400 border border-slate-800 hover:text-white flex items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-800 transition-all';
+            if (aiInputModeLabel) aiInputModeLabel.textContent = '✨ Gemini AI';
+            if (aiVoiceTriageBtn) {
+              aiVoiceTriageBtn.classList.remove('hidden');
+              aiVoiceTriageBtn.classList.add('flex');
+            }
+            if (isVoiceTriageRecording) {
+              stopVoiceTriageRecording(false);
+            }
+          }
+        }
+
+        // Export Conversation to Markdown File
+        function exportAiConversation() {
+          const session = getCurrentSession();
+          if (!session || !session.messages || session.messages.length === 0) {
+            alert('No messages in this chat to export.');
+            return;
+          }
+
+          let md = `# ${session.title || 'Cyber Shield AI Conversation'}\n`;
+          md += `*Exported on ${new Date().toLocaleString()}*\n\n---\n\n`;
+
+          session.messages.forEach(m => {
+            const role = m.role === 'user' ? '### 👤 User' : '### 🛡️ Cyber Shield AI';
+            const time = m.timestamp ? new Date(m.timestamp).toLocaleTimeString() : '';
+            md += `${role} (${time})\n\n${m.text}\n\n---\n\n`;
+          });
+
+          const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          const cleanTitle = (session.title || 'chat').replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
+          a.download = `cyber-shield-${cleanTitle}-${Date.now()}.md`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          playSciFiSound('click');
+        }
+
+        // Wire Event Listeners for Chat Form and Controls
+        if (aiChatForm && aiChatInput) {
+          // Form submit
+          aiChatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (isAiGenerating) {
+              // Clicked stop button
+              if (aiAbortController) aiAbortController.abort();
+              return;
+            }
+            const val = aiChatInput.value.trim();
+            if (!val) return;
+            handleSendAiMessage(val);
+          });
+
+          // Textarea auto-resize and Enter key handling
+          aiChatInput.addEventListener('input', () => {
+            aiChatInput.style.height = 'auto';
+            aiChatInput.style.height = Math.min(aiChatInput.scrollHeight, 140) + 'px';
+          });
+
+          aiChatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              if (isAiGenerating) return;
+              const val = aiChatInput.value.trim();
+              if (val) handleSendAiMessage(val);
+            }
+          });
+        }
+
+        // Voice Triage Button Listeners
+        if (aiVoiceTriageBtn) {
+          aiVoiceTriageBtn.addEventListener('click', () => {
+            if (isVoiceTriageRecording) {
+              stopVoiceTriageRecording(true);
+            } else {
+              startVoiceTriageRecording();
+            }
+          });
+        }
+
+        if (aiVoiceTriageSubmitBtn) {
+          aiVoiceTriageSubmitBtn.addEventListener('click', () => {
+            stopVoiceTriageRecording(true);
+          });
+        }
+
+        if (aiVoiceTriageCancelBtn) {
+          aiVoiceTriageCancelBtn.addEventListener('click', () => {
+            stopVoiceTriageRecording(false);
+          });
+        }
+
+        // Voice Dictation (Speech-to-Text in Textarea) Button
+        if (aiVoiceInputBtn) {
+          aiVoiceInputBtn.addEventListener('click', () => {
+            if (!aiSpeechRecognition) initAiVoiceRecognition();
+            if (!aiSpeechRecognition) return;
+
+            if (isAiVoiceRecording) {
+              aiSpeechRecognition.stop();
+              stopAiVoiceRecognition();
+            } else {
+              const lang = currentLang || 'en';
+              if (lang === 'ta') aiSpeechRecognition.lang = 'ta-IN';
+              else if (lang === 'hi') aiSpeechRecognition.lang = 'hi-IN';
+              else aiSpeechRecognition.lang = 'en-IN';
+
+              try {
+                aiSpeechRecognition.start();
+              } catch (e) {
+                stopAiVoiceRecognition();
+              }
+            }
+          });
+        }
+
+        // Stop Generation Button
+        if (aiStopGenBtn) {
+          aiStopGenBtn.addEventListener('click', () => {
+            if (aiAbortController) {
+              aiAbortController.abort();
+            }
+            isAiGenerating = false;
+            if (aiTypingIndicator) aiTypingIndicator.classList.add('hidden');
+          });
+        }
+
+        // Fullscreen Canvas Mode Toggle
+        const aiFullscreenToggleBtn = document.getElementById('ai-fullscreen-toggle-btn');
+        const aiFullscreenIcon = document.getElementById('ai-fullscreen-icon');
+        const aiChatMainContainer = document.getElementById('ai-chat-main-container');
+
+        if (aiFullscreenToggleBtn && aiChatMainContainer) {
+          aiFullscreenToggleBtn.addEventListener('click', () => {
+            const isFull = aiChatMainContainer.classList.contains('fixed');
+            if (!isFull) {
+              aiChatMainContainer.classList.add('fixed', 'inset-1', 'sm:inset-4', 'z-50', 'h-auto', 'max-h-none', 'shadow-[0_0_100px_rgba(0,0,0,0.95)]');
+              aiChatMainContainer.classList.remove('h-[calc(100vh-6.5rem)]', 'max-h-[92vh]');
+              if (aiFullscreenIcon) aiFullscreenIcon.className = 'fa-solid fa-compress';
+              aiFullscreenToggleBtn.title = 'Exit Fullscreen';
+            } else {
+              aiChatMainContainer.classList.remove('fixed', 'inset-1', 'sm:inset-4', 'z-50', 'h-auto', 'max-h-none', 'shadow-[0_0_100px_rgba(0,0,0,0.95)]');
+              aiChatMainContainer.classList.add('h-[calc(100vh-6.5rem)]', 'max-h-[92vh]');
+              if (aiFullscreenIcon) aiFullscreenIcon.className = 'fa-solid fa-expand';
+              aiFullscreenToggleBtn.title = 'Toggle Fullscreen Mode';
+            }
             playSciFiSound('click');
-            processAiQuery(text);
+          });
+        }
+
+        // Sidebar Controls
+        if (aiSidebarToggleBtn && aiChatSidebar) {
+          aiSidebarToggleBtn.addEventListener('click', () => {
+            aiChatSidebar.classList.toggle('hidden');
+            playSciFiSound('click');
+          });
+        }
+
+        if (aiSidebarCloseMobileBtn && aiChatSidebar) {
+          aiSidebarCloseMobileBtn.addEventListener('click', () => {
+            aiChatSidebar.classList.add('hidden');
+          });
+        }
+
+        if (aiNewChatBtn) {
+          aiNewChatBtn.addEventListener('click', () => {
+            createNewAiSession();
+          });
+        }
+
+        if (aiSearchChatsInput) {
+          aiSearchChatsInput.addEventListener('input', (e) => {
+            renderAiSessionsSidebar(e.target.value);
+          });
+        }
+
+        if (aiClearAllSessionsBtn) {
+          aiClearAllSessionsBtn.addEventListener('click', () => {
+            if (confirm('Clear all conversation history? This cannot be undone.')) {
+              localStorage.removeItem(AI_SESSIONS_STORAGE_KEY);
+              localStorage.removeItem(AI_CURRENT_SESSION_KEY);
+              renderAiSessionsSidebar();
+              renderAiSessionView();
+              playSciFiSound('click');
+            }
+          });
+        }
+
+        // Rename Session
+        if (aiRenameSessionBtn) {
+          aiRenameSessionBtn.addEventListener('click', () => {
+            const session = getCurrentSession();
+            if (!session) return;
+            const newTitle = prompt('Enter a new title for this conversation:', session.title);
+            if (newTitle && newTitle.trim()) {
+              updateCurrentSession(s => s.title = newTitle.trim());
+              if (aiCurrentSessionTitle) aiCurrentSessionTitle.textContent = newTitle.trim();
+              renderAiSessionsSidebar();
+            }
+          });
+        }
+
+        // Mode Switching (Cyber Defense vs ChatGPT General)
+        if (aiModeCyberBtn && aiModeGeneralBtn) {
+          aiModeCyberBtn.addEventListener('click', () => {
+            setAiMode('cyber');
+            playSciFiSound('click');
+          });
+
+          aiModeGeneralBtn.addEventListener('click', () => {
+            setAiMode('general');
+            playSciFiSound('click');
+          });
+        }
+
+        // Language Pills
+        document.querySelectorAll('.ai-lang-pill-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.ai-lang-pill-btn').forEach(b => {
+              b.className = 'ai-lang-pill-btn px-1.5 py-0.5 rounded text-slate-400 hover:text-white';
+            });
+            btn.className = 'ai-lang-pill-btn active px-1.5 py-0.5 rounded text-cyan-300 bg-cyan-950 font-bold';
+            const lang = btn.getAttribute('data-lang');
+            if (lang) {
+              currentLang = lang;
+            }
+            playSciFiSound('click');
           });
         });
 
-        if (clearAiChatBtn && aiChatMessages) {
-          clearAiChatBtn.addEventListener('click', () => {
-            aiChatMessages.innerHTML = `
-              <div class="flex items-start gap-2.5 max-w-[88%]">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-600 via-indigo-600 to-cyan-500 text-white flex items-center justify-center text-xs shrink-0 mt-0.5 shadow-md">
-                  <i class="fa-solid fa-shield-halved"></i>
-                </div>
-                <div class="p-3.5 rounded-2xl rounded-tl-sm bg-cyan-950/40 border border-cyan-800/60 text-slate-100 leading-relaxed shadow-md font-sans">
-                  <p class="font-bold text-white mb-1">Chat Cleared</p>
-                  <p>Ask me about any suspicious message, unexpected payment demand, or emergency steps.</p>
-                </div>
-              </div>
-            `;
+        // Prompt Starter Category Tabs
+        document.querySelectorAll('.ai-cat-tab-btn').forEach(tab => {
+          tab.addEventListener('click', () => {
+            document.querySelectorAll('.ai-cat-tab-btn').forEach(t => {
+              t.className = 'ai-cat-tab-btn px-2 py-0.5 rounded-lg text-slate-400 hover:text-white cursor-pointer whitespace-nowrap';
+            });
+            tab.className = 'ai-cat-tab-btn active px-2 py-0.5 rounded-lg bg-cyan-950 text-cyan-300 border border-cyan-500/40 cursor-pointer whitespace-nowrap';
+            const cat = tab.getAttribute('data-cat');
+            if (cat) {
+              activePromptCategory = cat;
+              renderAiPromptChips(cat);
+            }
+            playSciFiSound('click');
+          });
+        });
+
+        // TTS Global Audio Toggle
+        if (toggleAiTtsBtn && aiTtsIcon) {
+          toggleAiTtsBtn.addEventListener('click', () => {
+            isAiTtsActive = !isAiTtsActive;
+            if (isAiTtsActive) {
+              aiTtsIcon.className = 'fa-solid fa-volume-high text-cyan-300';
+              toggleAiTtsBtn.classList.add('border-cyan-400', 'bg-cyan-950/50');
+            } else {
+              aiTtsIcon.className = 'fa-solid fa-volume-xmark text-slate-500';
+              toggleAiTtsBtn.classList.remove('border-cyan-400', 'bg-cyan-950/50');
+              if (window.speechSynthesis) window.speechSynthesis.cancel();
+            }
             playSciFiSound('click');
           });
         }
+
+        // Clear Current Chat Messages
+        if (clearAiChatBtn) {
+          clearAiChatBtn.addEventListener('click', () => {
+            if (confirm('Clear messages in this conversation?')) {
+              updateCurrentSession(s => s.messages = []);
+              renderAiSessionView();
+              playSciFiSound('click');
+            }
+          });
+        }
+
+        // Export Chat Button
+        if (aiExportChatBtn) {
+          aiExportChatBtn.addEventListener('click', () => {
+            exportAiConversation();
+          });
+        }
+
+        // Initialize Prompt Chips & Sessions on Boot
+        renderAiPromptChips('scams');
+        renderAiSessionsSidebar();
+        renderAiSessionView();
+        initAiVoiceRecognition();
+        setAiMode('cyber');
+
+        // ========================================================
+        // INTERACTIVE STEP-BY-STEP ONBOARDING WALKTHROUGH ENGINE
+        // ========================================================
+        let currentOnboardingStep = 0;
+        const ONBOARDING_COMPLETED_KEY = 'scamshield_onboarding_completed_v1';
+
+        const onboardingSteps = [
+          {
+            stepNum: 1,
+            badge: "WELCOME CITIZEN",
+            title: "Welcome to Cyber Shield India",
+            subtitle: "National digital safety & cybercrime prevention portal",
+            desc: "Scam Shield is engineered to protect you and your loved ones from digital fraud, fake OTP calls, banking freezes, and online extortion. Designed for everyone — no technical knowledge required!",
+            icon: "fa-solid fa-shield-halved",
+            iconColor: "text-cyan-400",
+            iconBg: "from-blue-600 to-cyan-500",
+            keyHighlights: [
+              { icon: "fa-solid fa-check", text: "Instant 1-Tap verification for SMS, APKs, UPI links & calls" },
+              { icon: "fa-solid fa-check", text: "Official link to 1930 National Cyber Police Emergency Line" },
+              { icon: "fa-solid fa-check", text: "100% private: no passwords or banking pins ever requested" }
+            ],
+            sandboxHtml: `
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                  <span class="text-white font-bold">Safe Citizen Protection Grid</span>
+                </div>
+                <span class="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/40">ARMED</span>
+              </div>
+              <p class="text-slate-300 text-[11px] leading-relaxed">
+                Take this 60-second interactive tour to explore how to scan suspicious messages and access emergency help when in doubt.
+              </p>
+            `,
+            actionLabel: "Tour Key Features",
+            actionIcon: "fa-solid fa-compass",
+            actionCallback: () => {
+              goToOnboardingStep(1);
+            }
+          },
+          {
+            stepNum: 2,
+            badge: "CORE FEATURE",
+            title: "1. Threat Scanner (AI Vision & Text)",
+            subtitle: "Test suspicious SMS, WhatsApp links, and APK files before tapping",
+            desc: "Received an urgent message about unpaid electricity, PAN card block, or lucky lottery? Never click the link directly! Paste the message or upload a screenshot into the Threat Scanner. Our multi-engine AI checks the fraud registry and alerts you in 2 seconds.",
+            icon: "fa-solid fa-magnifying-glass-shield",
+            iconColor: "text-cyan-300",
+            iconBg: "from-cyan-600 to-blue-700",
+            keyHighlights: [
+              { icon: "fa-solid fa-comment-sms", text: "SMS & Text Analysis with fraud likelihood & red flag warnings" },
+              { icon: "fa-solid fa-link", text: "URL & Domain Safety check against known phishing domains" },
+              { icon: "fa-solid fa-camera", text: "Screenshot OCR: upload a photo of any message or UPI QR" }
+            ],
+            sandboxHtml: `
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-cyan-300 font-mono text-[10px] font-bold">TRY A SAMPLE LIVE SCAN NOW:</span>
+                  <span class="text-slate-400 text-[10px]">Tap to test below</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-700 space-y-1.5">
+                  <div class="text-[10px] font-mono text-red-400 font-bold">🚨 Sample SMS:</div>
+                  <p class="text-[11px] text-white italic">"Dear Customer, your electricity will be disconnected tonight. Call electricity officer 9876543210."</p>
+                  <button type="button" id="ob-try-scan-btn" class="w-full py-2 px-3 rounded-lg bg-red-950/70 hover:bg-red-900 border border-red-500/60 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors">
+                    <i class="fa-solid fa-magnifying-glass-shield text-cyan-300"></i>
+                    <span>Test This in Threat Scanner Now</span>
+                  </button>
+                </div>
+              </div>
+            `,
+            actionLabel: "Open Threat Scanner",
+            actionIcon: "fa-solid fa-magnifying-glass-shield",
+            actionCallback: () => {
+              closeOnboardingModal();
+              switchView('scanner');
+              const demoBtn = document.getElementById('demo-electricity-btn');
+              if (demoBtn) demoBtn.click();
+            }
+          },
+          {
+            stepNum: 3,
+            badge: "CRITICAL HELPLINE",
+            title: "2. The 1930 Emergency Helpline",
+            subtitle: "Official Cyber Crime Police hotline across all states in India",
+            desc: "If you or a family member has accidentally shared bank details or sent money to a fraudster, call 1930 immediately. Indian Cyber Police coordinate with banks to freeze recipient mule accounts during the Golden Hour (first 2-3 hours) so your funds can be saved.",
+            icon: "fa-solid fa-phone-volume",
+            iconColor: "text-red-300",
+            iconBg: "from-red-600 to-rose-700",
+            keyHighlights: [
+              { icon: "fa-solid fa-phone", text: "Toll-Free 24x7 National Cyber Police Helpline: Dial 1930" },
+              { icon: "fa-solid fa-clock", text: "Golden Hour Freeze: Immediate intervention freezes accounts" },
+              { icon: "fa-solid fa-file-shield", text: "Direct portal link to official cybercrime.gov.in" }
+            ],
+            sandboxHtml: `
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-red-300 font-mono text-[10px] font-bold">EMERGENCY ACTION SHEET PREVIEW:</span>
+                  <span class="text-emerald-400 text-[10px] font-bold">TOLL-FREE 1930</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-red-950/50 border border-red-500/50 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-white flex items-center gap-1.5">
+                      <i class="fa-solid fa-phone-volume text-red-400 animate-pulse"></i>
+                      National Cyber Cell Hotline (1930)
+                    </span>
+                    <span class="text-[9px] font-mono text-red-300 font-bold bg-red-900/60 px-1.5 py-0.5 rounded">24x7 ACTIVE</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 leading-snug">
+                    Always available via the glowing <strong>1930 button</strong> in the top header and navigation menu.
+                  </p>
+                  <button type="button" id="ob-try-helpline-btn" class="w-full py-2 px-3 rounded-lg bg-gradient-to-r from-red-600 to-rose-600 text-white font-black text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Preview 1930 Emergency Action Plan</span>
+                  </button>
+                </div>
+              </div>
+            `,
+            actionLabel: "View 1930 Action Sheet",
+            actionIcon: "fa-solid fa-phone-volume",
+            actionCallback: () => {
+              openModal(emergencySheetModal);
+            }
+          },
+          {
+            stepNum: 4,
+            badge: "AI COMPANION",
+            title: "3. Cyber Defense AI Assistant",
+            subtitle: "ChatGPT-like conversational guidance & Voice Triage for non-tech users",
+            desc: "Have a confusing question? Ask the AI Assistant in plain language or use the Voice Triage button to simply speak your concern. It explains technical threats in simple words and drafts official police complaints (FIR letters under Section 66D IT Act).",
+            icon: "fa-solid fa-robot",
+            iconColor: "text-purple-300",
+            iconBg: "from-purple-600 to-indigo-700",
+            keyHighlights: [
+              { icon: "fa-solid fa-microphone", text: "Voice Triage: Just speak your problem — auto-converted to text" },
+              { icon: "fa-solid fa-file-lines", text: "Automated Police Complaint Drafting (Formal FIR ready)" },
+              { icon: "fa-solid fa-language", text: "Multi-language support in English, Hindi & Tamil" }
+            ],
+            sandboxHtml: `
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-purple-300 font-mono text-[10px] font-bold">COMMON QUESTIONS CITIZENS ASK:</span>
+                  <span class="text-slate-400 text-[10px]">Instant AI answers</span>
+                </div>
+                <div class="flex flex-wrap gap-1.5">
+                  <span class="px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-[10px] text-slate-200">"Is this bank KYC message real?"</span>
+                  <span class="px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-[10px] text-slate-200">"How to freeze my UPI ID?"</span>
+                  <span class="px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-[10px] text-slate-200">"Someone is threatening me on video call"</span>
+                </div>
+                <button type="button" id="ob-try-ai-btn" class="w-full py-2 px-3 rounded-lg bg-purple-900/70 hover:bg-purple-900 border border-purple-500/50 text-purple-200 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                  <i class="fa-solid fa-robot text-cyan-300"></i>
+                  <span>Try AI Assistant in Chat Mode</span>
+                </button>
+              </div>
+            `,
+            actionLabel: "Try AI Assistant",
+            actionIcon: "fa-solid fa-robot",
+            actionCallback: () => {
+              closeOnboardingModal();
+              switchView('ai-assistant');
+            }
+          },
+          {
+            stepNum: 5,
+            badge: "ALL SET",
+            title: "You Are Protected & Ready!",
+            subtitle: "3 simple rules to remember every day",
+            desc: "You are now equipped with national cyber defense tools. Keep these golden safety habits in mind:",
+            icon: "fa-solid fa-circle-check",
+            iconColor: "text-emerald-300",
+            iconBg: "from-emerald-600 to-teal-700",
+            keyHighlights: [
+              { icon: "fa-solid fa-ban", text: "Rule 1: Never share OTPs or passwords with ANY caller, ever." },
+              { icon: "fa-solid fa-shield", text: "Rule 2: When in doubt, scan the message with Threat Scanner." },
+              { icon: "fa-solid fa-phone", text: "Rule 3: In an emergency, dial 1930 within the first hour." }
+            ],
+            sandboxHtml: `
+              <div class="p-3 rounded-xl bg-gradient-to-r from-emerald-950/60 to-cyan-950/60 border border-emerald-500/40 text-center space-y-1.5">
+                <div class="text-xs font-extrabold text-white">🎉 Welcome to the Citizen Cyber Defense Shield!</div>
+                <p class="text-[11px] text-slate-300">You can relaunch this interactive guide anytime by tapping "Quick Tour" at the top.</p>
+              </div>
+            `,
+            actionLabel: "Start Using App Now",
+            actionIcon: "fa-solid fa-rocket",
+            actionCallback: () => {
+              finishOnboarding();
+            }
+          }
+        ];
+
+        const onboardingModal = document.getElementById('onboarding-modal');
+        const closeOnboardingBtn = document.getElementById('close-onboarding-btn');
+        const skipOnboardingBtn = document.getElementById('skip-onboarding-btn');
+        const onboardingPrevBtn = document.getElementById('onboarding-prev-btn');
+        const onboardingNextBtn = document.getElementById('onboarding-next-btn');
+        const onboardingActionBtn = document.getElementById('onboarding-action-btn');
+        const onboardingCardBody = document.getElementById('onboarding-card-body');
+        const onboardingSandbox = document.getElementById('onboarding-sandbox');
+        const onboardingStepCounter = document.getElementById('onboarding-step-counter');
+        const onboardingStepBadge = document.getElementById('onboarding-step-badge');
+        const onboardingNextLabel = document.getElementById('onboarding-next-label');
+        const onboardingActionLabel = document.getElementById('onboarding-action-label');
+        const onboardingActionIcon = document.getElementById('onboarding-action-icon');
+
+        const topWalkthroughBtn = document.getElementById('top-walkthrough-btn');
+        const drawerWalkthroughBtn = document.getElementById('drawer-walkthrough-btn');
+        const homeStartWalkthroughBtn = document.getElementById('home-start-walkthrough-btn');
+
+        function startOnboardingTour() {
+          currentOnboardingStep = 0;
+          renderOnboardingStep();
+          openModal(onboardingModal);
+          playSciFiSound('pulse');
+        }
+
+        function closeOnboardingModal() {
+          closeModal(onboardingModal);
+        }
+
+        function finishOnboarding() {
+          try {
+            localStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
+          } catch(e) {}
+          closeOnboardingModal();
+          triggerBroadcastToast("🛡️ Quick Tour complete! Welcome to Cyber Shield.");
+          playSciFiSound('success');
+        }
+
+        function goToOnboardingStep(stepIdx) {
+          if (stepIdx < 0) stepIdx = 0;
+          if (stepIdx >= onboardingSteps.length) {
+            finishOnboarding();
+            return;
+          }
+          currentOnboardingStep = stepIdx;
+          renderOnboardingStep();
+          playSciFiSound('click');
+        }
+
+        function renderOnboardingStep() {
+          const step = onboardingSteps[currentOnboardingStep];
+          if (!step) return;
+
+          // Update header counters
+          if (onboardingStepCounter) {
+            onboardingStepCounter.textContent = `STEP ${step.stepNum} OF ${onboardingSteps.length}`;
+          }
+          if (onboardingStepBadge) {
+            onboardingStepBadge.textContent = step.badge;
+          }
+
+          // Update progress bars
+          for (let i = 1; i <= 5; i++) {
+            const bar = document.getElementById(`ob-bar-${i}`);
+            if (bar) {
+              if (i <= currentOnboardingStep + 1) {
+                bar.className = 'flex-1 bg-cyan-400 rounded-full transition-all duration-300';
+              } else {
+                bar.className = 'flex-1 bg-slate-800 rounded-full transition-all duration-300';
+              }
+            }
+          }
+
+          // Build Card Body
+          let highlightsHtml = '';
+          step.keyHighlights.forEach(h => {
+            highlightsHtml += `
+              <div class="flex items-start gap-2.5 text-xs text-slate-200">
+                <div class="w-5 h-5 rounded-md bg-cyan-950 border border-cyan-500/40 text-cyan-300 flex items-center justify-center shrink-0 mt-0.5 text-[10px]">
+                  <i class="${h.icon}"></i>
+                </div>
+                <span class="leading-relaxed">${h.text}</span>
+              </div>
+            `;
+          });
+
+          if (onboardingCardBody) {
+            onboardingCardBody.innerHTML = `
+              <div class="flex items-start gap-3.5">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br ${step.iconBg} ${step.iconColor} flex items-center justify-center text-xl shrink-0 shadow-lg border border-cyan-300/30">
+                  <i class="${step.icon}"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <h3 class="text-base sm:text-lg font-black text-white leading-tight">${step.title}</h3>
+                  <p class="text-xs text-cyan-300 font-mono mt-0.5">${step.subtitle}</p>
+                </div>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">${step.desc}</p>
+              <div class="space-y-2 pt-1 border-t border-slate-800/80">
+                ${highlightsHtml}
+              </div>
+            `;
+          }
+
+          // Sandbox preview
+          if (onboardingSandbox) {
+            onboardingSandbox.innerHTML = step.sandboxHtml;
+
+            // Wire sandbox interactive buttons if present
+            const tryScanBtn = document.getElementById('ob-try-scan-btn');
+            if (tryScanBtn) {
+              tryScanBtn.addEventListener('click', () => {
+                closeOnboardingModal();
+                switchView('scanner');
+                const demoBtn = document.getElementById('demo-electricity-btn');
+                if (demoBtn) demoBtn.click();
+              });
+            }
+
+            const tryHelplineBtn = document.getElementById('ob-try-helpline-btn');
+            if (tryHelplineBtn) {
+              tryHelplineBtn.addEventListener('click', () => {
+                openModal(emergencySheetModal);
+              });
+            }
+
+            const tryAiBtn = document.getElementById('ob-try-ai-btn');
+            if (tryAiBtn) {
+              tryAiBtn.addEventListener('click', () => {
+                closeOnboardingModal();
+                switchView('ai-assistant');
+              });
+            }
+          }
+
+          // Action button label & icon
+          if (onboardingActionLabel) onboardingActionLabel.textContent = step.actionLabel;
+          if (onboardingActionIcon) {
+            onboardingActionIcon.className = `${step.actionIcon} text-[10px]`;
+          }
+
+          // Previous button state
+          if (onboardingPrevBtn) {
+            if (currentOnboardingStep === 0) {
+              onboardingPrevBtn.classList.add('opacity-40', 'pointer-events-none');
+            } else {
+              onboardingPrevBtn.classList.remove('opacity-40', 'pointer-events-none');
+            }
+          }
+
+          // Next button label
+          if (onboardingNextLabel) {
+            if (currentOnboardingStep === onboardingSteps.length - 1) {
+              onboardingNextLabel.textContent = "Finish Tour";
+            } else {
+              onboardingNextLabel.textContent = "Next Step";
+            }
+          }
+        }
+
+        // Walkthrough Event Listeners
+        if (closeOnboardingBtn) closeOnboardingBtn.addEventListener('click', closeOnboardingModal);
+        if (skipOnboardingBtn) skipOnboardingBtn.addEventListener('click', finishOnboarding);
+
+        if (onboardingPrevBtn) {
+          onboardingPrevBtn.addEventListener('click', () => {
+            if (currentOnboardingStep > 0) {
+              goToOnboardingStep(currentOnboardingStep - 1);
+            }
+          });
+        }
+
+        if (onboardingNextBtn) {
+          onboardingNextBtn.addEventListener('click', () => {
+            if (currentOnboardingStep < onboardingSteps.length - 1) {
+              goToOnboardingStep(currentOnboardingStep + 1);
+            } else {
+              finishOnboarding();
+            }
+          });
+        }
+
+        if (onboardingActionBtn) {
+          onboardingActionBtn.addEventListener('click', () => {
+            const step = onboardingSteps[currentOnboardingStep];
+            if (step && typeof step.actionCallback === 'function') {
+              playSciFiSound('click');
+              step.actionCallback();
+            }
+          });
+        }
+
+        if (topWalkthroughBtn) {
+          topWalkthroughBtn.addEventListener('click', () => {
+            startOnboardingTour();
+          });
+        }
+
+        if (drawerWalkthroughBtn) {
+          drawerWalkthroughBtn.addEventListener('click', () => {
+            closeDrawer();
+            startOnboardingTour();
+          });
+        }
+
+        if (homeStartWalkthroughBtn) {
+          homeStartWalkthroughBtn.addEventListener('click', () => {
+            startOnboardingTour();
+          });
+        }
+
+        // Check if new user on first visit to auto-launch onboarding tour
+        setTimeout(() => {
+          try {
+            const completed = localStorage.getItem(ONBOARDING_COMPLETED_KEY);
+            if (!completed) {
+              startOnboardingTour();
+            }
+          } catch(e) {}
+        }, 800);
 
         // Initialize Heatmap to default bank category on boot
         updateRiskHeatmap('bank');
